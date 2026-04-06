@@ -1,2 +1,2 @@
-# Maps-LandingPage
-Desarrollo de una LandingPage para la organizacion Maps Asesores
+# Kondor-LandingPage
+Desarrollo de una LandingPage para la startup
