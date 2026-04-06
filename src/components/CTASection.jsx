@@ -41,9 +41,8 @@ export default function CTASection({ onOpenContactForm }) {
           transition={{ delay: 0.1, duration: 0.7, ease: 'easeOut' }}
           className="text-3xl lg:text-5xl xl:text-6xl font-black text-white leading-tight tracking-tight mb-6 text-balance"
         >
-          ¿Tu organización está lista
-          <br />
-          para el <span className="text-brand-accent">siguiente nivel</span>?
+          Construyamos el próximo sistema{' '}
+          <span className="text-brand-accent">que tu organización necesita.</span>
         </motion.h2>
 
         <motion.p
@@ -53,8 +52,8 @@ export default function CTASection({ onOpenContactForm }) {
           transition={{ delay: 0.25, duration: 0.6 }}
           className="text-white/60 text-base lg:text-lg leading-relaxed max-w-xl mx-auto mb-10"
         >
-          Somos cuatro personas con criterio técnico y visión clara. Sin presentaciones largas:
-          hablemos sobre lo que podemos construir juntos.
+          En Kondor diseñamos y construimos sistemas con criterio de ingeniería, foco operativo
+          y visión de largo plazo. Conversemos sobre lo que hoy necesita tu empresa para crecer mejor.
         </motion.p>
 
         <motion.div

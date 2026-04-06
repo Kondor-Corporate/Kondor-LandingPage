@@ -31,17 +31,17 @@ function TikTokIcon({ size = 18 }) {
 const socials = [
   {
     label: 'Instagram',
-    href:  'https://instagram.com',
+    href:  'https://www.instagram.com/kondor.io',
     Icon:  Instagram,
   },
   {
     label: 'LinkedIn',
-    href:  'https://linkedin.com',
+    href:  'https://www.linkedin.com/company/kondorcorporate/',
     Icon:  Linkedin,
   },
   {
     label: 'TikTok',
-    href:  'https://tiktok.com',
+    href:  'https://www.tiktok.com/@kondor.io',
     Icon:  TikTokIcon,
   },
 ]
@@ -77,7 +77,7 @@ export default function Footer() {
       <div className="relative bg-[#1E1E24]/80 backdrop-blur-2xl">
 
         {/* ── Main grid ─────────────────────────────────────── */}
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-16 pb-10">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-16 pb-14">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8">
 
             {/* Brand column */}
@@ -88,8 +88,7 @@ export default function Footer() {
                 className="h-8 w-auto max-w-[9.5rem] object-contain object-left opacity-95"
               />
               <p className="text-sm text-white/50 leading-relaxed max-w-xs">
-                Orquestamos la evolución industrial sincronizando el instinto
-                humano con la exactitud digital.
+                Software, sistemas e ingeniería aplicada para organizaciones que quieren operar mejor.
               </p>
 
               {/* Email */}
@@ -122,7 +121,7 @@ export default function Footer() {
               <p className="text-[11px] font-semibold uppercase tracking-widest text-white/30 mb-4">
                 Navegación
               </p>
-              <ul className="flex flex-col gap-3">
+              <ul className="flex flex-col gap-4">
                 {navLinks.map((link) => (
                   <li key={link.href}>
                     <a
@@ -159,7 +158,7 @@ export default function Footer() {
                   bg-gradient-to-r from-transparent via-white/55 to-transparent" />
                 <span className="pointer-events-none absolute inset-0
                   bg-gradient-to-b from-white/[0.12] via-transparent to-black/[0.06]" />
-                <span className="relative">Elevar mi organización</span>
+                <span className="relative">Hablar con el equipo</span>
                 <ArrowUpRight size={14} className="relative" />
               </motion.a>
             </div>

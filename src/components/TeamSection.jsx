@@ -114,6 +114,9 @@ export default function TeamSection() {
               <br />
               <span className="text-brand-accent">del despegue.</span>
             </h2>
+            <p className="text-sm text-white/50 leading-relaxed max-w-sm mt-3">
+              Cuatro cofundadores construyendo Kondor desde producto, ingeniería y visión operativa.
+            </p>
           </div>
 
           <div className="flex items-center gap-3 text-[10px] font-mono text-white/25 tracking-widest uppercase shrink-0">
@@ -165,7 +168,7 @@ export default function TeamSection() {
               >
                 <div className="w-6 h-px bg-brand-accent/60 mb-3 group-hover:w-10 transition-all duration-300" />
 
-                <p className="text-lg font-black text-white tracking-tight leading-none mb-1">
+                <p className="text-sm font-bold text-white tracking-tight leading-none mb-1">
                   {name}
                 </p>
                 <p className="text-[10px] font-semibold text-brand-accent/80 tracking-[0.18em] uppercase">
