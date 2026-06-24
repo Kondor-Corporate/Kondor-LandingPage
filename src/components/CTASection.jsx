@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { ArrowRight, ExternalLink } from 'lucide-react'
+import { trackContactClick, trackCtaClick } from '../lib/analytics'
 
 export default function CTASection({ onOpenContactForm }) {
   return (
@@ -68,7 +69,18 @@ export default function CTASection({ onOpenContactForm }) {
             onClick={(event) => {
               if (!onOpenContactForm) return
               event.preventDefault()
-              onOpenContactForm()
+              trackCtaClick({
+                cta_id: 'cta_section_contact',
+                cta_label: 'Solicitar conversacion',
+                cta_destination: 'contact_modal',
+                location: 'cta_section',
+              })
+              trackContactClick({
+                contact_type: 'form_open',
+                link_text: 'Solicitar conversacion',
+                location: 'cta_section',
+              })
+              onOpenContactForm('cta_section_contact')
             }}
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
@@ -80,6 +92,14 @@ export default function CTASection({ onOpenContactForm }) {
 
           <motion.a
             href="#portfolio"
+            onClick={() => {
+              trackCtaClick({
+                cta_id: 'cta_section_portfolio',
+                cta_label: 'Ver casos y recursos',
+                cta_destination: '#portfolio',
+                location: 'cta_section',
+              })
+            }}
             whileHover={{ scale: 1.02 }}
             className="flex items-center gap-2 text-white/55 hover:text-white font-medium text-sm transition-colors duration-200 px-4 py-4 rounded-xl hover:bg-white/5"
           >

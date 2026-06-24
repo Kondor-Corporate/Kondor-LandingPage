@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { ArrowRight, ChevronDown } from 'lucide-react'
+import { trackContactClick, trackCtaClick } from '../lib/analytics'
 
 /* ── Radar constants ──────────────────────────────────────────── */
 
@@ -96,6 +97,19 @@ export default function HeroSection() {
             >
               <motion.a
                 href="#contacto"
+                onClick={() => {
+                  trackCtaClick({
+                    cta_id: 'hero_contact_anchor',
+                    cta_label: 'Hablar con el equipo',
+                    cta_destination: '#contacto',
+                    location: 'hero',
+                  })
+                  trackContactClick({
+                    contact_type: 'section_anchor',
+                    link_text: 'Hablar con el equipo',
+                    location: 'hero',
+                  })
+                }}
                 whileHover={{ scale: 1.04, boxShadow: '0 0 44px rgba(237,73,47,0.55)' }}
                 whileTap={{ scale: 0.97 }}
                 className="relative flex items-center gap-3 overflow-hidden rounded-2xl px-8 py-4 text-sm font-bold text-white"
@@ -115,6 +129,14 @@ export default function HeroSection() {
 
               <motion.a
                 href="#vision"
+                onClick={() => {
+                  trackCtaClick({
+                    cta_id: 'hero_vision_anchor',
+                    cta_label: 'Conocer mas',
+                    cta_destination: '#vision',
+                    location: 'hero',
+                  })
+                }}
                 whileHover={{ x: 3 }}
                 className="flex items-center gap-2 text-sm text-white/55 hover:text-white transition-colors"
               >

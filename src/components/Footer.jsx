@@ -1,5 +1,6 @@
 import { Mail, ArrowUpRight, Instagram, Linkedin } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { trackContactClick, trackCtaClick, trackOutboundClick } from '../lib/analytics'
 
 const navLinks = [
   { label: 'Inicio',     href: '#inicio' },
@@ -53,6 +54,13 @@ function SocialBtn({ label, href, Icon }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
+      onClick={() => {
+        trackOutboundClick({
+          outbound_url: href,
+          link_text: label,
+          location: 'footer_social',
+        })
+      }}
       whileHover={{ scale: 1.10 }}
       whileTap={{ scale: 0.94 }}
       className="relative flex items-center justify-center w-10 h-10 rounded-full overflow-hidden
@@ -66,7 +74,7 @@ function SocialBtn({ label, href, Icon }) {
   )
 }
 
-export default function Footer() {
+export default function Footer({ onOpenContactForm }) {
   return (
     <footer className="relative border-t border-white/[0.08] overflow-hidden">
       {/* Atmospheric glow behind footer */}
@@ -94,6 +102,13 @@ export default function Footer() {
               {/* Email */}
               <a
                 href="mailto:kondorcorporate@gmail.com"
+                onClick={() => {
+                  trackContactClick({
+                    contact_type: 'email',
+                    link_text: 'kondorcorporate@gmail.com',
+                    location: 'footer',
+                  })
+                }}
                 className="group inline-flex items-center gap-2 text-sm text-white/60 hover:text-white
                   transition-colors duration-200 w-fit"
               >
@@ -126,6 +141,15 @@ export default function Footer() {
                   <li key={link.href}>
                     <a
                       href={link.href}
+                      onClick={() => {
+                        if (link.href === '#contacto') {
+                          trackContactClick({
+                            contact_type: 'section_anchor',
+                            link_text: link.label,
+                            location: 'footer_nav',
+                          })
+                        }
+                      }}
                       className="text-sm text-white/55 hover:text-white transition-colors duration-200"
                     >
                       {link.label}
@@ -146,6 +170,22 @@ export default function Footer() {
               </p>
               <motion.a
                 href="#contacto"
+                onClick={(event) => {
+                  if (!onOpenContactForm) return
+                  event.preventDefault()
+                  trackCtaClick({
+                    cta_id: 'footer_contact',
+                    cta_label: 'Hablar con el equipo',
+                    cta_destination: 'contact_modal',
+                    location: 'footer',
+                  })
+                  trackContactClick({
+                    contact_type: 'form_open',
+                    link_text: 'Hablar con el equipo',
+                    location: 'footer',
+                  })
+                  onOpenContactForm('footer_contact')
+                }}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 className="relative inline-flex overflow-hidden items-center gap-2 text-sm font-semibold

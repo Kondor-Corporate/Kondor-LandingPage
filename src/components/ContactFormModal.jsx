@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, Send } from 'lucide-react'
+import { trackLeadFormSubmit } from '../lib/analytics'
 
 const DEFAULT_FORMSPREE_ENDPOINT = 'https://formspree.io/f/xblovokz'
 
@@ -55,6 +56,10 @@ export default function ContactFormModal({ open, onClose }) {
 
     // Honeypot anti-spam: bots often complete hidden fields.
     if (form.website.trim()) {
+      trackLeadFormSubmit({
+        form_id: 'contact_modal',
+        submit_status: 'spam_filtered',
+      })
       setSubmitStatus('success')
       setSubmitMessage('Mensaje enviado. Te responderemos pronto.')
       return
@@ -110,8 +115,19 @@ export default function ContactFormModal({ open, onClose }) {
       setSubmitStatus('success')
       setSubmitMessage('Mensaje enviado. Te responderemos pronto.')
       setLastSubmittedHash(payloadHash)
+      trackLeadFormSubmit({
+        form_id: 'contact_modal',
+        submit_status: 'success',
+        has_company: Boolean(form.company.trim()),
+        has_message: Boolean(form.message.trim()),
+      })
       setForm({ name: '', email: '', company: '', message: '', website: '' })
     } catch (error) {
+      trackLeadFormSubmit({
+        form_id: 'contact_modal',
+        submit_status: 'error',
+        error_message: error?.message || 'unknown',
+      })
       setSubmitStatus('error')
       setSubmitMessage(error?.message || 'No pudimos enviar el mensaje. Intenta nuevamente en unos minutos.')
     } finally {
