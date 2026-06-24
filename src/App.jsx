@@ -12,6 +12,7 @@ import { initAnalytics, initializeAttribution, trackLeadFormView, trackPageView 
 
 export default function App() {
   const [isContactFormOpen, setIsContactFormOpen] = useState(false)
+  const [contactFormOrigin, setContactFormOrigin] = useState(null)
 
   useEffect(() => {
     initializeAttribution()
@@ -23,6 +24,7 @@ export default function App() {
   }, [])
 
   const openContactForm = (origin) => {
+    setContactFormOrigin(origin || null)
     setIsContactFormOpen(true)
     trackLeadFormView({
       form_id: 'contact_modal',
@@ -42,7 +44,11 @@ export default function App() {
         <CTASection onOpenContactForm={openContactForm} />
       </main>
       <Footer onOpenContactForm={openContactForm} />
-      <ContactFormModal open={isContactFormOpen} onClose={() => setIsContactFormOpen(false)} />
+      <ContactFormModal
+        open={isContactFormOpen}
+        ctaOrigin={contactFormOrigin}
+        onClose={() => setIsContactFormOpen(false)}
+      />
     </div>
   )
 }

@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, Send } from 'lucide-react'
 import { trackLeadFormSubmit } from '../lib/analytics'
+import { persistLeadFromContactForm } from '../lib/leadCapture'
 
 const DEFAULT_FORMSPREE_ENDPOINT = 'https://formspree.io/f/xblovokz'
 
-export default function ContactFormModal({ open, onClose }) {
+export default function ContactFormModal({ open, ctaOrigin, onClose }) {
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -83,7 +84,9 @@ export default function ContactFormModal({ open, onClose }) {
     setSubmitMessage('')
 
     try {
-      const response = await fetch(formEndpoint, {
+      const persistedLead = await persistLeadFromContactForm(form, ctaOrigin)
+
+      fetch(formEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,20 +100,9 @@ export default function ContactFormModal({ open, onClose }) {
           _subject: `Nuevo contacto desde landing - ${form.name}`,
           _gotcha: form.website,
         }),
+      }).catch((error) => {
+        console.warn('formspree_notification_failed', error)
       })
-
-      if (!response.ok) {
-        let message = 'No se pudo enviar el formulario.'
-        try {
-          const errorData = await response.json()
-          if (Array.isArray(errorData?.errors) && errorData.errors.length > 0) {
-            message = errorData.errors.map((entry) => entry.message).join(' ')
-          }
-        } catch {
-          // Keep fallback message when response body is not JSON.
-        }
-        throw new Error(message)
-      }
 
       setSubmitStatus('success')
       setSubmitMessage('Mensaje enviado. Te responderemos pronto.')
@@ -118,6 +110,7 @@ export default function ContactFormModal({ open, onClose }) {
       trackLeadFormSubmit({
         form_id: 'contact_modal',
         submit_status: 'success',
+        lead_id: persistedLead?.id,
         has_company: Boolean(form.company.trim()),
         has_message: Boolean(form.message.trim()),
       })
