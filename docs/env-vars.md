@@ -76,6 +76,16 @@ Estado actual:
 
 Despues de verificar el dominio, puede mantenerse o retirarse segun el metodo de verificacion elegido.
 
+### `VITE_LEAD_INGESTION_ENDPOINT`
+
+Endpoint publico al que el formulario envia leads.
+
+```env
+VITE_LEAD_INGESTION_ENDPOINT=/api/leads
+```
+
+En deploy same-origin se puede dejar el valor default. Si se usa otro host para API, apuntar a la URL completa.
+
 ## Setup recomendado
 
 ### Local
@@ -132,3 +142,25 @@ https://kondorcorporate.com/robots.txt
   - `lead_form_view`
   - `lead_form_submit`
 - No hay doble carga de GA4 cuando GTM esta activo.
+
+## Variables nuevas para Fase 2 y Fase 3
+
+### `DATABASE_URL`
+
+URL de conexion runtime para Prisma.
+
+En Supabase, usar preferentemente la conexion pooled para despliegues serverless:
+
+```env
+DATABASE_URL="postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+```
+
+### `DIRECT_URL`
+
+URL directa para migraciones Prisma.
+
+```env
+DIRECT_URL="postgresql://postgres:PASSWORD@db.PROJECT_REF.supabase.co:5432/postgres"
+```
+
+No exponer ninguna de estas variables con prefijo `VITE_`. Deben existir solo del lado servidor/local.

@@ -26,8 +26,8 @@ Fuera de alcance en esta etapa:
 - Tailwind CSS 3.
 - Framer Motion para animaciones.
 - Lucide React para iconos.
-- React Hook Form + Zod para el formulario de contacto.
-- Deploy configurado para Vercel con `vercel.json`.
+- Formulario de contacto controlado con estado local de React.
+- No hay backend ni DB configurados antes de este piloto.
 
 ### Estructura relevante
 
@@ -108,6 +108,7 @@ No implementada en Fase 0/Fase 1.
 Arquitectura minima recomendada para fases siguientes:
 
 - Supabase/PostgreSQL como fuente de verdad.
+- Prisma como capa de schema, migraciones y cliente de acceso a Supabase Postgres.
 - Endpoint server-side para crear leads y eventos de negocio.
 - Tablas sugeridas:
   - `campaigns`
