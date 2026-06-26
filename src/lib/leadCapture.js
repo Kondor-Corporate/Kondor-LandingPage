@@ -1,9 +1,16 @@
 import { getAttributionContext } from './analytics'
 
-const DEFAULT_LEAD_ENDPOINT = '/api/leads'
+export function hasLeadIngestionEndpoint() {
+  return Boolean(import.meta.env.VITE_LEAD_INGESTION_ENDPOINT?.trim())
+}
 
 export async function persistLeadFromContactForm(form, ctaId) {
-  const endpoint = import.meta.env.VITE_LEAD_INGESTION_ENDPOINT || DEFAULT_LEAD_ENDPOINT
+  const endpoint = import.meta.env.VITE_LEAD_INGESTION_ENDPOINT?.trim()
+
+  if (!endpoint) {
+    throw new Error('lead_ingestion_not_configured')
+  }
+
   const { attribution, entry } = getAttributionContext()
 
   const response = await fetch(endpoint, {

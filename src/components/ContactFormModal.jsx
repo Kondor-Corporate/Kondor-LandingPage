@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, Send } from 'lucide-react'
 import { trackLeadFormSubmit } from '../lib/analytics'
-import { persistLeadFromContactForm } from '../lib/leadCapture'
+import { hasLeadIngestionEndpoint, persistLeadFromContactForm } from '../lib/leadCapture'
 
 const DEFAULT_FORMSPREE_ENDPOINT = 'https://formspree.io/f/xblovokz'
 
@@ -23,6 +23,28 @@ export default function ContactFormModal({ open, ctaOrigin, onClose }) {
   const formIdFromEnv = import.meta.env.VITE_FORMSPREE_FORM_ID
   const formEndpoint =
     endpointFromEnv || (formIdFromEnv ? `https://formspree.io/f/${formIdFromEnv}` : DEFAULT_FORMSPREE_ENDPOINT)
+
+  const notifyFormspree = async () => {
+    const response = await fetch(formEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        name: form.name,
+        email: form.email,
+        company: form.company,
+        message: form.message,
+        _subject: `Nuevo contacto desde landing - ${form.name}`,
+        _gotcha: form.website,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error('formspree_notification_failed')
+    }
+  }
 
   useEffect(() => {
     if (!open) return
@@ -84,25 +106,17 @@ export default function ContactFormModal({ open, ctaOrigin, onClose }) {
     setSubmitMessage('')
 
     try {
-      const persistedLead = await persistLeadFromContactForm(form, ctaOrigin)
+      let persistedLead = null
+      const usesBusinessPersistence = hasLeadIngestionEndpoint()
 
-      fetch(formEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          company: form.company,
-          message: form.message,
-          _subject: `Nuevo contacto desde landing - ${form.name}`,
-          _gotcha: form.website,
-        }),
-      }).catch((error) => {
-        console.warn('formspree_notification_failed', error)
-      })
+      if (usesBusinessPersistence) {
+        persistedLead = await persistLeadFromContactForm(form, ctaOrigin)
+        notifyFormspree().catch((error) => {
+          console.warn('formspree_notification_failed', error)
+        })
+      } else {
+        await notifyFormspree()
+      }
 
       setSubmitStatus('success')
       setSubmitMessage('Mensaje enviado. Te responderemos pronto.')
@@ -111,6 +125,7 @@ export default function ContactFormModal({ open, ctaOrigin, onClose }) {
         form_id: 'contact_modal',
         submit_status: 'success',
         lead_id: persistedLead?.id,
+        persistence: usesBusinessPersistence ? 'supabase' : 'formspree',
         has_company: Boolean(form.company.trim()),
         has_message: Boolean(form.message.trim()),
       })
@@ -240,7 +255,7 @@ export default function ContactFormModal({ open, ctaOrigin, onClose }) {
 
                 <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-xs text-white/40">
-                    {submitStatus === 'idle' ? 'Responderemos al correo que ingreses en este formulario.' : submitMessage}
+                    {submitStatus === 'idle' && 'Responderemos al correo que ingreses en este formulario.'}
                   </p>
                   <motion.button
                     whileHover={{ scale: 1.02 }}

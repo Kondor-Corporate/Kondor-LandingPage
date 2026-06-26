@@ -57,6 +57,9 @@ Cliente:
 VITE_LEAD_INGESTION_ENDPOINT=/api/leads
 ```
 
+La variable debe quedar sin configurar durante Fases 0/1. En ese caso el formulario sigue enviando por Formspree.
+Configurarla activa la persistencia obligatoria en Supabase y deja Formspree como notificacion best-effort.
+
 ## Pasos para probar punta a punta
 
 ### 1. Completar Supabase

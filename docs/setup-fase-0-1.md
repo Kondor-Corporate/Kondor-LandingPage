@@ -87,13 +87,15 @@ Crear `.env.local` en la raiz del repo:
 VITE_GTM_ID=GTM-XXXXXXX
 VITE_GA4_MEASUREMENT_ID=
 VITE_FORMSPREE_FORM_ID=your_form_id_here
-VITE_LEAD_INGESTION_ENDPOINT=/api/leads
 ```
 
 Notas:
 
 - Si `VITE_GTM_ID` existe, la app no carga GA4 directo para evitar doble medicion.
 - Si todavia no hay GTM, se puede usar `VITE_GA4_MEASUREMENT_ID` directo.
+- `VITE_FORMSPREE_FORM_ID` recibe solo el ID, no la URL completa.
+- Durante Fases 0/1 no configurar `VITE_LEAD_INGESTION_ENDPOINT`: Vite no ejecuta `api/leads.js`.
+- Despues de configurar Supabase y un runtime server-side, habilitar `VITE_LEAD_INGESTION_ENDPOINT=/api/leads`.
 - `.env.local` no se commitea.
 
 ## 4. Variables en hosting
@@ -104,7 +106,6 @@ En el hosting de produccion/staging, cargar:
 VITE_GTM_ID=GTM-XXXXXXX
 VITE_GA4_MEASUREMENT_ID=
 VITE_FORMSPREE_FORM_ID=your_form_id_here
-VITE_LEAD_INGESTION_ENDPOINT=/api/leads
 ```
 
 Para Fase 0/1 no hacen falta `DATABASE_URL` ni `DIRECT_URL`.
@@ -158,8 +159,11 @@ window.dataLayer
 
 - click en CTA principal;
 - abrir formulario;
-- enviar formulario de prueba;
+- enviar formulario de prueba y confirmar respuesta exitosa de Formspree;
 - click en redes externas.
+
+En esta etapa no debe aparecer una solicitud a `/api/leads`. Esa ruta se habilita al completar Supabase y ejecutar la
+landing en un entorno que soporte funciones server-side.
 
 ## 7. Validacion en GTM/GA4
 
@@ -176,4 +180,5 @@ window.dataLayer
 - UTMs se conservan durante navegacion razonable.
 - `content_piece_id` queda presente en eventos.
 - No se envia PII a GA4/GTM.
+- El formulario envia por Formspree y emite `lead_form_submit` con `persistence=formspree`.
 - Search Console tiene propiedad creada o queda pendiente con responsable claro.
