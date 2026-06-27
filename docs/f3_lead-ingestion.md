@@ -64,7 +64,7 @@ Configurarla activa la persistencia obligatoria en Supabase y deja Formspree com
 
 ### 1. Completar Supabase
 
-Seguir `docs/prisma-supabase.md`.
+Seguir `docs/f2_prisma-supabase.md`.
 
 Cuando el proyecto exista y `.env` tenga `DATABASE_URL` y `DIRECT_URL`, correr:
 
