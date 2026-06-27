@@ -168,10 +168,20 @@ landing en un entorno que soporte funciones server-side.
 ## 7. Validacion en GTM/GA4
 
 1. En GTM, usar Preview Mode.
-2. Abrir la landing.
-3. Confirmar eventos en `dataLayer`.
-4. En GA4, usar DebugView o Realtime.
-5. Confirmar que no hay doble medicion de `page_view`.
+2. Conectar la landing local. Si Tag Assistant rechaza `localhost`, usar:
+
+```text
+http://127.0.0.1:5173/
+```
+
+La landing conserva automaticamente los parametros temporales `gtm_auth`, `gtm_preview` y `gtm_cookies_win` que
+Tag Assistant agrega a la URL. Esos parametros solo se reenvian al script de GTM durante una sesion Preview.
+
+3. Abrir la landing.
+4. Confirmar eventos en `dataLayer`.
+5. Confirmar que `GA4 - Configuracion base` se activa una sola vez.
+6. En GA4, usar DebugView o Realtime.
+7. Confirmar que no hay doble medicion de `page_view`.
 
 ## Criterios de aceptacion
 

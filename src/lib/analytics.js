@@ -9,6 +9,23 @@ function hasWindow() {
   return typeof window !== 'undefined'
 }
 
+function getGtmScriptUrl(gtmId) {
+  const scriptUrl = new URL('https://www.googletagmanager.com/gtm.js')
+  scriptUrl.searchParams.set('id', gtmId)
+
+  const pageParams = new URLSearchParams(window.location.search)
+  const preview = pageParams.get('gtm_preview')
+  const auth = pageParams.get('gtm_auth')
+
+  if (preview && auth) {
+    scriptUrl.searchParams.set('gtm_preview', preview)
+    scriptUrl.searchParams.set('gtm_auth', auth)
+    scriptUrl.searchParams.set('gtm_cookies_win', pageParams.get('gtm_cookies_win') || 'x')
+  }
+
+  return scriptUrl.toString()
+}
+
 function nowIso() {
   return new Date().toISOString()
 }
@@ -159,7 +176,7 @@ export function initAnalytics() {
     window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' })
     const script = document.createElement('script')
     script.async = true
-    script.src = `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(gtmId)}`
+    script.src = getGtmScriptUrl(gtmId)
     document.head.appendChild(script)
   }
 
