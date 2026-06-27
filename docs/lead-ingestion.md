@@ -66,7 +66,7 @@ Configurarla activa la persistencia obligatoria en Supabase y deja Formspree com
 
 Seguir `docs/prisma-supabase.md`.
 
-Cuando el proyecto exista y `.env.local` tenga `DATABASE_URL` y `DIRECT_URL`, correr:
+Cuando el proyecto exista y `.env` tenga `DATABASE_URL` y `DIRECT_URL`, correr:
 
 ```bash
 npm run prisma:migrate -- --name init_business_analytics

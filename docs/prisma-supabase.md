@@ -39,18 +39,21 @@ En Supabase:
    - conexion pooled para runtime;
    - conexion directa/session para migraciones.
 
-En `.env.local` completar:
+En `.env` completar:
 
 ```env
 DATABASE_URL="postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
-DIRECT_URL="postgresql://postgres:PASSWORD@db.PROJECT_REF.supabase.co:5432/postgres"
+DIRECT_URL="postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
 ```
 
 Notas:
 
 - Reemplazar `PROJECT_REF`, `PASSWORD` y host/region por los valores reales de Supabase.
+- Prisma CLI carga `.env` automaticamente, pero no `.env.local`.
+- `DATABASE_URL` usa Transaction pooler en el puerto `6543`.
+- `DIRECT_URL` puede usar Session pooler en el puerto `5432`. La conexion directa tambien sirve si el equipo tiene IPv6.
 - No usar prefijo `VITE_` para estas variables.
-- No commitear `.env.local`.
+- No commitear `.env`.
 
 ### 3. Aplicar migracion Prisma
 

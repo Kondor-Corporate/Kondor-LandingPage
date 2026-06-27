@@ -81,7 +81,7 @@ Eventos ya disponibles:
 
 ## 3. Variables locales
 
-Crear `.env.local` en la raiz del repo:
+Crear `.env` en la raiz del repo:
 
 ```env
 VITE_GTM_ID=GTM-XXXXXXX
@@ -96,7 +96,7 @@ Notas:
 - `VITE_FORMSPREE_FORM_ID` recibe solo el ID, no la URL completa.
 - Durante Fases 0/1 no configurar `VITE_LEAD_INGESTION_ENDPOINT`: Vite no ejecuta `api/leads.js`.
 - Despues de configurar Supabase y un runtime server-side, habilitar `VITE_LEAD_INGESTION_ENDPOINT=/api/leads`.
-- `.env.local` no se commitea.
+- `.env` no se commitea.
 
 ## 4. Variables en hosting
 

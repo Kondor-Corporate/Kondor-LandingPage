@@ -90,7 +90,7 @@ En deploy same-origin se puede dejar el valor default. Si se usa otro host para 
 
 ### Local
 
-1. Crear `.env.local`.
+1. Crear `.env`.
 2. Agregar al menos una de estas variables:
 
 ```env
@@ -160,7 +160,8 @@ DATABASE_URL="postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-us-east-1.pooler.
 URL directa para migraciones Prisma.
 
 ```env
-DIRECT_URL="postgresql://postgres:PASSWORD@db.PROJECT_REF.supabase.co:5432/postgres"
+DIRECT_URL="postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
 ```
 
-No exponer ninguna de estas variables con prefijo `VITE_`. Deben existir solo del lado servidor/local.
+Prisma CLI carga `.env` automaticamente. No exponer ninguna de estas variables con prefijo `VITE_`; deben existir
+solo del lado servidor/local.
