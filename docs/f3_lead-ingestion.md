@@ -78,7 +78,16 @@ npm run prisma:migrate -- --name init_business_analytics
 npm run prisma:generate
 ```
 
-### 3. Correr un entorno que soporte `/api`
+### 3. Validar persistencia contra Supabase
+
+```bash
+npm run test:lead-ingestion
+```
+
+El smoke test crea un lead temporal mediante `api/leads.js`, verifica atribucion, eventos e historial, y elimina ese
+registro al finalizar para no contaminar reporting.
+
+### 4. Correr un entorno que soporte `/api`
 
 Vite puro no ejecuta `api/leads.js`.
 
@@ -88,7 +97,19 @@ Opciones:
 - usar Vercel CLI con `vercel dev`;
 - adaptar el endpoint al hosting elegido.
 
-### 4. Enviar un formulario con UTMs
+### 5. Configurar Vercel
+
+Agregar en Production y Preview:
+
+```env
+DATABASE_URL="postgresql://..."
+DIRECT_URL="postgresql://..."
+VITE_LEAD_INGESTION_ENDPOINT=/api/leads
+```
+
+`DATABASE_URL` y `DIRECT_URL` son privadas. Solo `VITE_LEAD_INGESTION_ENDPOINT` se incorpora al frontend.
+
+### 6. Enviar un formulario con UTMs
 
 Ejemplo:
 
@@ -98,7 +119,7 @@ Ejemplo:
 
 Completar el formulario y enviarlo.
 
-### 5. Verificar en Supabase
+### 7. Verificar en Supabase
 
 En Table Editor o Prisma Studio:
 
@@ -117,6 +138,7 @@ En Table Editor o Prisma Studio:
 - El lead queda asociado a fuente, medio, campania, pieza y CTA.
 - El historial inicial queda en `NEW`.
 - GA4/GTM sigue recibiendo eventos de comportamiento.
+- GA4/GTM no recibe `lead_id`, nombre, email, empresa ni mensaje.
 - Formspree no es fuente de verdad.
 
 ## Supuestos

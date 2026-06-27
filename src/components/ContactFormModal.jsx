@@ -106,11 +106,10 @@ export default function ContactFormModal({ open, ctaOrigin, onClose }) {
     setSubmitMessage('')
 
     try {
-      let persistedLead = null
       const usesBusinessPersistence = hasLeadIngestionEndpoint()
 
       if (usesBusinessPersistence) {
-        persistedLead = await persistLeadFromContactForm(form, ctaOrigin)
+        await persistLeadFromContactForm(form, ctaOrigin)
         notifyFormspree().catch((error) => {
           console.warn('formspree_notification_failed', error)
         })
@@ -124,7 +123,6 @@ export default function ContactFormModal({ open, ctaOrigin, onClose }) {
       trackLeadFormSubmit({
         form_id: 'contact_modal',
         submit_status: 'success',
-        lead_id: persistedLead?.id,
         persistence: usesBusinessPersistence ? 'supabase' : 'formspree',
         has_company: Boolean(form.company.trim()),
         has_message: Boolean(form.message.trim()),

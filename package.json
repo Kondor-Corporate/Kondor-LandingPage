@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "test:lead-ingestion": "node --env-file=.env scripts/smoke-lead-ingestion.mjs"
   },
   "dependencies": {
     "@prisma/client": "^6.10.1",
