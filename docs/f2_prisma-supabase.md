@@ -55,15 +55,21 @@ Notas:
 - No usar prefijo `VITE_` para estas variables.
 - No commitear `.env`.
 
-### 3. Aplicar migracion Prisma
+### 3. Aplicar migraciones versionadas
 
-Cuando las variables esten cargadas:
+Cuando las variables esten cargadas, aplicar las migraciones que ya existen en el repositorio:
 
 ```bash
-npm run prisma:migrate -- --name init_business_analytics
+npm run prisma:deploy
 ```
 
-Esto genera una carpeta en `prisma/migrations/` y aplica las tablas en Supabase.
+Este comando no genera archivos nuevos: aplica en Supabase las migraciones versionadas pendientes.
+
+`prisma:migrate` se usa solo al desarrollar un cambio nuevo de schema:
+
+```bash
+npm run prisma:migrate -- --name nombre_descriptivo
+```
 
 ### 4. Verificar en Supabase
 
@@ -172,6 +178,7 @@ La clave y URL de base quedan en variables del lado servidor. Nunca deben expone
 ## Criterios de aceptacion
 
 - Prisma modela las tablas minimas del piloto.
+- `npm run prisma:deploy` puede aplicar el schema desde un checkout limpio.
 - Las tablas soportan trazabilidad por canal, campania, pieza, landing path, entry point y CTA.
 - El modelo soporta historial de estados.
 - La base sigue siendo simple y transferible a MAPS.

@@ -108,8 +108,12 @@ Configurar variables en Project Settings -> Environment Variables:
 - `VITE_GTM_ID`
 - `VITE_GA4_MEASUREMENT_ID` si no se usa GTM.
 - `VITE_FORMSPREE_FORM_ID` o `VITE_FORMSPREE_ENDPOINT`.
+- `VITE_LEAD_INGESTION_ENDPOINT=/api/leads`.
+- `DATABASE_URL`.
+- `DIRECT_URL`.
 
-Luego redeploy.
+`DATABASE_URL` y `DIRECT_URL` son variables privadas del servidor. Luego aplicar migraciones con
+`npm run prisma:deploy` y hacer redeploy.
 
 ## Search Console
 

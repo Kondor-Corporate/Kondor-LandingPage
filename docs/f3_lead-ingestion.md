@@ -69,7 +69,7 @@ Seguir `docs/f2_prisma-supabase.md`.
 Cuando el proyecto exista y `.env` tenga `DATABASE_URL` y `DIRECT_URL`, correr:
 
 ```bash
-npm run prisma:migrate -- --name init_business_analytics
+npm run prisma:deploy
 ```
 
 ### 2. Generar Prisma Client
