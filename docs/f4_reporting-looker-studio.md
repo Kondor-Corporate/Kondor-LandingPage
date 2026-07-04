@@ -1,8 +1,9 @@
-# Reporting para Looker Studio - Fase 4
+# Reporting para Data Studio - Fase 4
 
 ## Objetivo
 
-Exponer metricas de negocio entendibles sin conectar Looker Studio a las tablas crudas ni incluir PII.
+Exponer metricas de negocio entendibles sin conectar Data Studio (antes Looker Studio) a las tablas crudas ni
+incluir PII.
 
 La separacion de fuentes se mantiene:
 
@@ -20,7 +21,7 @@ La separacion de fuentes se mantiene:
 | `vw_channel_performance` | fecha + canal + medium | comparar canales y resultados |
 | `vw_cta_performance` | fecha + CTA | comparar CTAs de origen |
 
-`_vw_lead_reporting_base` es una vista interna. No debe conectarse a Looker Studio ni recibir permisos para el
+`_vw_lead_reporting_base` es una vista interna. No debe conectarse a Data Studio ni recibir permisos para el
 usuario de reporting.
 
 ## Diccionario de metricas
@@ -47,7 +48,7 @@ piloto.
 
 Los valores sin atribucion se normalizan como `(not_set)`.
 
-## Reglas de agregacion en Looker Studio
+## Reglas de agregacion en Data Studio
 
 Los campos de conteo usan agregacion `SUM`.
 
@@ -55,14 +56,18 @@ Los campos `*_rate_pct` ya estan calculados para la granularidad de cada fila. N
 graficos que agrupen varias fechas o dimensiones, crear campos calculados ponderados:
 
 ```text
-Qualification rate = 100 * SUM(qualified_leads) / SUM(total_leads)
-Meeting rate = 100 * SUM(meeting_booked_leads) / SUM(total_leads)
-Proposal rate = 100 * SUM(proposal_sent_leads) / SUM(total_leads)
-Win rate = 100 * SUM(won_leads) / SUM(total_leads)
+Qualification rate = SUM(qualified_leads) / SUM(total_leads)
+Meeting rate = SUM(meeting_booked_leads) / SUM(total_leads)
+Proposal rate = SUM(proposal_sent_leads) / SUM(total_leads)
+Win rate = SUM(won_leads) / SUM(total_leads)
 ```
 
-Mostrar estos campos como numero decimal con sufijo `%`. No usar el tipo porcentaje de Looker sobre valores que ya
-estan expresados de `0` a `100`.
+Mostrar estos campos con formato `Percent(2)`. Las formulas devuelven una razon de `0` a `1`, que Data Studio
+convierte visualmente a porcentaje. No multiplicar por `100`: el conector PostgreSQL puede rechazar esa expresion al
+combinar conteos `INT64` con el resultado decimal `FLOAT64`.
+
+Los campos existentes `*_rate_pct` si estan expresados de `0` a `100`. Solo deben usarse sin reagrupar las filas y
+deben conservar formato numerico, no `Percent`.
 
 En `vw_lead_funnel`, sumar `lead_count` por `stage_key` para rangos de varias fechas. No sumar
 `conversion_from_total_pct`.
@@ -104,7 +109,7 @@ Conectar GA4 como una fuente separada para sesiones, trafico y comportamiento. N
 de leads mediante joins directos: en este piloto la comparacion debe hacerse por periodo y dimensiones compatibles
 como source, medium y campaign.
 
-## Usuario read-only para Looker Studio
+## Usuario read-only para Data Studio
 
 No usar el usuario `postgres` ni compartir `DATABASE_URL`.
 
@@ -135,9 +140,9 @@ TO looker_reporting;
 Supabase recomienda crear un usuario distinto para cada servicio externo y otorgar solo los permisos necesarios:
 [Postgres Roles](https://supabase.com/docs/guides/database/postgres/roles).
 
-## Conexion desde Looker Studio
+## Conexion desde Data Studio
 
-1. Entrar a Looker Studio con la cuenta de Kondor.
+1. Entrar a Data Studio con la cuenta de Kondor.
 2. Crear una fuente de datos.
 3. Elegir el conector oficial `PostgreSQL`.
 4. Usar la conexion **Session pooler** de Supabase:
@@ -169,7 +174,7 @@ SELECT * FROM vw_cta_performance ORDER BY lead_date DESC LIMIT 100;
 
 ## Criterios de aceptacion
 
-- Looker Studio puede consultar solo vistas agregadas.
+- Data Studio puede consultar solo vistas agregadas.
 - Ninguna vista publica contiene nombre, email, telefono, empresa o mensaje.
 - Los filtros de fecha usan `lead_date`.
 - El funnel distingue progresion (`QUALIFIED`, reunion, propuesta) de resultados (`WON`, `LOST`).
