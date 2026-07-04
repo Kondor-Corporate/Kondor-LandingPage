@@ -9,9 +9,13 @@
     "preview": "vite preview",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:status": "prisma migrate status",
     "prisma:studio": "prisma studio",
+    "test:attribution": "node scripts/smoke-attribution.mjs",
     "test:lead-ingestion": "node --env-file=.env scripts/smoke-lead-ingestion.mjs",
-    "test:reporting-views": "node --env-file=.env scripts/smoke-reporting-views.mjs"
+    "test:reporting-views": "node --env-file=.env scripts/smoke-reporting-views.mjs",
+    "test:pilot": "npm run build && npm run test:attribution && npm run prisma:status && npm run test:lead-ingestion && npm run test:reporting-views"
   },
   "dependencies": {
     "@prisma/client": "^6.10.1",
