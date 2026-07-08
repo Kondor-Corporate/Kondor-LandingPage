@@ -16,7 +16,7 @@ const { fontFamily } = loadFont("normal", {
 const TICKS = Array.from({ length: 24 }, (_, i) => {
   const deg = i * 15;
   const rad = (deg * Math.PI) / 180;
-  const r = 182;
+  const r = 170;
   return {
     deg,
     x: r * Math.sin(rad),
@@ -27,108 +27,97 @@ const TICKS = Array.from({ length: 24 }, (_, i) => {
 });
 
 const BLIPS = [
-  { xOff: 43, yOff: -51, cycleFrac: 0.11 },
-  { xOff: -52, yOff: 91, cycleFrac: 0.58 },
-  { xOff: -75, yOff: -27, cycleFrac: 0.8 },
+  { xOff: 40, yOff: -48, cycleFrac: 0.11 },
+  { xOff: -50, yOff: 85, cycleFrac: 0.58 },
+  { xOff: -70, yOff: -25, cycleFrac: 0.8 },
 ];
+
+// Alineado con la landing actual
+const HEADLINE_LINES = ["Evolución tecnológica", "real, construida con", "ingeniería"];
 
 const STATS = [
-  { value: 3, suffix: "+", label: "Productos en producción" },
+  { value: 3, suffix: "+", label: "Productos en desarrollo" },
   { value: 100, suffix: "%", label: "Ingeniería propia" },
-  { value: 4, suffix: "", label: "Especialistas" },
-];
-
-const HEADLINE_LINES = [
-  "Diseñados para",
-  "despegar fuerte",
-  "y escalar rápido",
+  { value: 4, suffix: "", label: "Co-fundadores" },
 ];
 
 export const HeroScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
+  // Duración: 150 frames (5s) — timings comprimidos proporcionalmente
   const fadeOut = interpolate(
     frame,
-    [durationInFrames - fps * 0.5, durationInFrames],
+    [durationInFrames - fps * 0.4, durationInFrames],
     [1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
-
-  // Background
   const bgOpacity = interpolate(frame, [0, fps * 0.3], [0, 1], {
     extrapolateRight: "clamp",
   });
 
-  // Radar sweep rotation (continuous)
-  const sweepAngle = interpolate(frame, [0, fps * 4], [0, 360], {
+  // Radar sweep (5s full rotation)
+  const sweepAngle = interpolate(frame, [0, fps * 5], [0, 360], {
     extrapolateRight: "extend",
   });
 
-  // Headline lines enter one by one
+  // Headline lines — stagger
   const lineAnimations = HEADLINE_LINES.map((_, i) => {
-    const start = fps * (0.3 + i * 0.35);
-    const y = interpolate(frame, [start, start + fps * 0.5], [40, 0], {
+    const start = fps * (0.2 + i * 0.28);
+    const y = interpolate(frame, [start, start + fps * 0.4], [36, 0], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
     });
-    const opacity = interpolate(frame, [start, start + fps * 0.5], [0, 1], {
+    const opacity = interpolate(frame, [start, start + fps * 0.4], [0, 1], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
     });
     return { y, opacity };
   });
 
-  // Tag line
-  const tagStart = fps * 0.15;
-  const tagOpacity = interpolate(frame, [tagStart, tagStart + fps * 0.4], [0, 1], {
+  // Tag
+  const tagOpacity = interpolate(frame, [fps * 0.1, fps * 0.45], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
   // Subtitle
-  const subStart = fps * 1.5;
-  const subOpacity = interpolate(frame, [subStart, subStart + fps * 0.5], [0, 1], {
+  const subStart = fps * 1.2;
+  const subOpacity = interpolate(frame, [subStart, subStart + fps * 0.4], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const subY = interpolate(frame, [subStart, subStart + fps * 0.5], [20, 0], {
+  const subY = interpolate(frame, [subStart, subStart + fps * 0.4], [18, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Stats enter
-  const statsOpacity = interpolate(
-    frame,
-    [fps * 2.0, fps * 2.6],
-    [0, 1],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
-  );
+  // Stats
+  const statsOpacity = interpolate(frame, [fps * 1.7, fps * 2.2], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const statsProgress = interpolate(frame, [fps * 1.7, fps * 3.5], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
 
-  // Radar enters
+  // Radar
   const radarScale = spring({
-    frame: frame - fps * 0.6,
+    frame: frame - fps * 0.5,
     fps,
-    config: { damping: 200 },
-    durationInFrames: fps * 1.2,
+    config: { damping: 220 },
+    durationInFrames: fps * 1.0,
   });
-  const radarOpacity = interpolate(frame, [fps * 0.6, fps * 1.2], [0, 1], {
+  const radarOpacity = interpolate(frame, [fps * 0.5, fps * 1.0], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Blips: pulse in sync with 4s sweep cycle
-  const cycleDuration = fps * 4;
+  const cycleDuration = fps * 5;
   const cycleFrame = frame % cycleDuration;
 
-  // HUD readouts
-  const hudOpacity = interpolate(frame, [fps * 1.8, fps * 2.4], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
-  // Stats counter
-  const statsProgress = interpolate(frame, [fps * 2.0, fps * 3.2], [0, 1], {
+  const hudOpacity = interpolate(frame, [fps * 1.4, fps * 1.9], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -142,17 +131,17 @@ export const HeroScene: React.FC = () => {
         overflow: "hidden",
       }}
     >
-      {/* Background radial gradient */}
+      {/* Background radial */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(ellipse at 72% 65%, rgba(237,73,47,0.92) 0%, rgba(180,45,22,0.55) 28%, rgba(30,30,36,1) 58%)",
+            "radial-gradient(ellipse at 72% 65%, rgba(237,73,47,0.88) 0%, rgba(180,45,22,0.5) 28%, rgba(30,30,36,1) 58%)",
         }}
       />
 
-      {/* Grid overlay */}
+      {/* Grid */}
       <div
         style={{
           position: "absolute",
@@ -160,25 +149,25 @@ export const HeroScene: React.FC = () => {
           backgroundImage:
             "linear-gradient(rgba(255,255,255,0.9) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.9) 1px, transparent 1px)",
           backgroundSize: "56px 56px",
-          opacity: 0.05,
+          opacity: 0.04,
         }}
       />
 
-      {/* Atmospheric glows */}
+      {/* Atmospheric glow */}
       <div
         style={{
           position: "absolute",
-          top: "20%",
-          left: -80,
-          width: 600,
-          height: 600,
+          top: "15%",
+          left: -60,
+          width: 550,
+          height: 550,
           borderRadius: "50%",
-          background: "rgba(237,73,47,0.15)",
+          background: "rgba(237,73,47,0.12)",
           filter: "blur(100px)",
         }}
       />
 
-      {/* Left side — Copy */}
+      {/* Left — Copy */}
       <div
         style={{
           position: "absolute",
@@ -190,10 +179,9 @@ export const HeroScene: React.FC = () => {
           flexDirection: "column",
           justifyContent: "center",
           padding: "0 80px",
-          gap: 28,
+          gap: 24,
         }}
       >
-        {/* Tag */}
         <div style={{ opacity: tagOpacity }}>
           <span
             style={{
@@ -209,7 +197,7 @@ export const HeroScene: React.FC = () => {
           >
             <span
               style={{
-                width: 32,
+                width: 28,
                 height: 1,
                 background: "rgba(255,255,255,0.4)",
                 display: "inline-block",
@@ -219,8 +207,7 @@ export const HeroScene: React.FC = () => {
           </span>
         </div>
 
-        {/* Headline lines */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {HEADLINE_LINES.map((line, i) => (
             <div
               key={i}
@@ -232,14 +219,14 @@ export const HeroScene: React.FC = () => {
               <h1
                 style={{
                   margin: 0,
-                  fontSize: 76,
+                  fontSize: 70,
                   fontWeight: 900,
                   lineHeight: 1.05,
                   letterSpacing: "-0.02em",
                   color: i === 2 ? "#ED492F" : "white",
                   textShadow:
                     i === 2
-                      ? "0 0 56px rgba(237,73,47,0.55)"
+                      ? "0 0 50px rgba(237,73,47,0.5)"
                       : undefined,
                 }}
               >
@@ -249,7 +236,6 @@ export const HeroScene: React.FC = () => {
           ))}
         </div>
 
-        {/* Subtitle */}
         <div
           style={{
             opacity: subOpacity,
@@ -261,42 +247,44 @@ export const HeroScene: React.FC = () => {
           <div
             style={{
               width: 3,
-              background: "rgba(255,255,255,0.2)",
+              background: "rgba(255,255,255,0.18)",
               borderRadius: 2,
-              marginRight: 20,
+              marginRight: 18,
               flexShrink: 0,
             }}
           />
           <p
             style={{
               margin: 0,
-              fontSize: 18,
+              fontSize: 16,
               color: "rgba(255,255,255,0.6)",
               fontWeight: 300,
               lineHeight: 1.6,
             }}
           >
-            Impulsa el despegue de tu empresa — ¿Listo para volar?
+            Impulsa el despegue de tu empresa - ¿Listo para volar?
           </p>
         </div>
 
-        {/* Stats */}
         <div
           style={{
             opacity: statsOpacity,
             display: "flex",
-            gap: 40,
-            paddingTop: 20,
+            gap: 36,
+            paddingTop: 16,
             borderTop: "1px solid rgba(255,255,255,0.1)",
           }}
         >
           {STATS.map(({ value, suffix, label }) => {
             const currentVal = Math.round(value * statsProgress);
             return (
-              <div key={label} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <div
+                key={label}
+                style={{ display: "flex", flexDirection: "column", gap: 3 }}
+              >
                 <span
                   style={{
-                    fontSize: 32,
+                    fontSize: 28,
                     fontWeight: 900,
                     color: "white",
                     lineHeight: 1,
@@ -307,8 +295,8 @@ export const HeroScene: React.FC = () => {
                 </span>
                 <span
                   style={{
-                    fontSize: 10,
-                    color: "rgba(255,255,255,0.45)",
+                    fontSize: 9,
+                    color: "rgba(255,255,255,0.4)",
                     textTransform: "uppercase",
                     letterSpacing: "0.18em",
                   }}
@@ -321,7 +309,7 @@ export const HeroScene: React.FC = () => {
         </div>
       </div>
 
-      {/* Right side — Radar */}
+      {/* Right — Radar */}
       <div
         style={{
           position: "absolute",
@@ -337,13 +325,12 @@ export const HeroScene: React.FC = () => {
           transform: `scale(${0.5 + radarScale * 0.5})`,
         }}
       >
-        {/* Top HUD bar */}
         <div
           style={{
             position: "absolute",
-            top: 40,
-            left: 60,
-            right: 60,
+            top: 36,
+            left: 50,
+            right: 50,
             display: "flex",
             justifyContent: "space-between",
             opacity: hudOpacity,
@@ -373,31 +360,26 @@ export const HeroScene: React.FC = () => {
           </span>
         </div>
 
-        {/* Radar disk */}
-        <div style={{ position: "relative", width: 420, height: 420 }}>
-          {/* Ambient glow */}
+        <div style={{ position: "relative", width: 390, height: 390 }}>
           <div
             style={{
               position: "absolute",
-              inset: -60,
+              inset: -50,
               borderRadius: "50%",
-              background: "rgba(237,73,47,0.06)",
-              filter: "blur(80px)",
+              background: "rgba(237,73,47,0.05)",
+              filter: "blur(70px)",
             }}
           />
-
-          {/* Radial background */}
           <div
             style={{
               position: "absolute",
               inset: 0,
               borderRadius: "50%",
               background:
-                "radial-gradient(circle, rgba(237,73,47,0.08) 0%, rgba(20,20,28,0.55) 60%, transparent 100%)",
+                "radial-gradient(circle, rgba(237,73,47,0.07) 0%, rgba(20,20,28,0.5) 60%, transparent 100%)",
             }}
           />
 
-          {/* Concentric rings */}
           {[0.25, 0.5, 0.75, 1].map((s, i) => (
             <div
               key={s}
@@ -408,12 +390,11 @@ export const HeroScene: React.FC = () => {
                 top: `${(1 - s) * 50}%`,
                 left: `${(1 - s) * 50}%`,
                 borderRadius: "50%",
-                border: `1px solid rgba(255,255,255,${i === 3 ? 0.11 : 0.045})`,
+                border: `1px solid rgba(255,255,255,${i === 3 ? 0.1 : 0.04})`,
               }}
             />
           ))}
 
-          {/* Crosshair */}
           <div
             style={{
               position: "absolute",
@@ -421,7 +402,7 @@ export const HeroScene: React.FC = () => {
               left: 20,
               right: 20,
               height: 1,
-              background: "rgba(255,255,255,0.055)",
+              background: "rgba(255,255,255,0.05)",
               transform: "translateY(-50%)",
             }}
           />
@@ -432,48 +413,24 @@ export const HeroScene: React.FC = () => {
               top: 20,
               bottom: 20,
               width: 1,
-              background: "rgba(255,255,255,0.055)",
+              background: "rgba(255,255,255,0.05)",
               transform: "translateX(-50%)",
             }}
           />
 
-          {/* Diagonal guides */}
-          {[45, 135].map((angle) => (
-            <div
-              key={angle}
-              style={{
-                position: "absolute",
-                inset: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                style={{
-                  width: "100%",
-                  height: 1,
-                  background: "rgba(255,255,255,0.025)",
-                  transform: `rotate(${angle}deg)`,
-                }}
-              />
-            </div>
-          ))}
-
-          {/* Tick marks */}
           {TICKS.map(({ deg, x, y, isMajor, isMid }) => (
             <div
               key={deg}
               style={{
                 position: "absolute",
                 width: 1,
-                height: isMajor ? 14 : isMid ? 8 : 4,
+                height: isMajor ? 12 : isMid ? 7 : 3,
                 top: `calc(50% + ${y}px)`,
                 left: `calc(50% + ${x}px)`,
                 transform: `translate(-50%, -50%) rotate(${deg}deg)`,
                 background: isMajor
-                  ? "rgba(237,73,47,0.55)"
-                  : "rgba(255,255,255,0.18)",
+                  ? "rgba(237,73,47,0.5)"
+                  : "rgba(255,255,255,0.15)",
               }}
             />
           ))}
@@ -484,17 +441,15 @@ export const HeroScene: React.FC = () => {
               position: "absolute",
               inset: 0,
               borderRadius: "50%",
-              background: `conic-gradient(from ${sweepAngle}deg, rgba(237,73,47,0.15) 0deg, rgba(237,73,47,0.03) 52deg, transparent 52deg)`,
+              background: `conic-gradient(from ${sweepAngle}deg, rgba(237,73,47,0.14) 0deg, rgba(237,73,47,0.03) 50deg, transparent 50deg)`,
             }}
           />
-
-          {/* Sweep leading edge */}
           <div
             style={{
               position: "absolute",
               inset: 0,
               borderRadius: "50%",
-              background: `conic-gradient(from ${sweepAngle}deg, rgba(237,73,47,0.9) 0deg, transparent 2.5deg)`,
+              background: `conic-gradient(from ${sweepAngle}deg, rgba(237,73,47,0.88) 0deg, transparent 2.5deg)`,
             }}
           />
 
@@ -504,9 +459,7 @@ export const HeroScene: React.FC = () => {
             const diff = Math.abs(blipFrame - cycleFrac);
             const wrapped = Math.min(diff, 1 - diff);
             const blipOpacity =
-              wrapped < 0.06
-                ? interpolate(wrapped, [0, 0.06], [1, 0])
-                : 0;
+              wrapped < 0.06 ? interpolate(wrapped, [0, 0.06], [1, 0]) : 0;
             const blipScale =
               wrapped < 0.06
                 ? interpolate(wrapped, [0, 0.06], [1.8, 0.5])
@@ -516,8 +469,8 @@ export const HeroScene: React.FC = () => {
                 key={i}
                 style={{
                   position: "absolute",
-                  width: 8,
-                  height: 8,
+                  width: 7,
+                  height: 7,
                   borderRadius: "50%",
                   top: `calc(50% + ${yOff}px)`,
                   left: `calc(50% + ${xOff}px)`,
@@ -525,39 +478,31 @@ export const HeroScene: React.FC = () => {
                   background: "#ED492F",
                   opacity: blipOpacity,
                   boxShadow:
-                    "0 0 10px rgba(237,73,47,0.9), 0 0 22px rgba(237,73,47,0.4)",
+                    "0 0 9px rgba(237,73,47,0.9), 0 0 20px rgba(237,73,47,0.4)",
                 }}
               />
             );
           })}
 
-          {/* Center dot pulse */}
+          {/* Center pulse */}
           {(() => {
             const pulseFrac = (frame % (fps * 2)) / (fps * 2);
-            const pulseScale = interpolate(
-              pulseFrac,
-              [0, 0.5, 1],
-              [1, 1.7, 1]
-            );
-            const pulseOpacity = interpolate(
-              pulseFrac,
-              [0, 0.5, 1],
-              [1, 0.45, 1]
-            );
+            const pulseScale = interpolate(pulseFrac, [0, 0.5, 1], [1, 1.7, 1]);
+            const pulseOpacity = interpolate(pulseFrac, [0, 0.5, 1], [1, 0.4, 1]);
             return (
               <div
                 style={{
                   position: "absolute",
                   top: "50%",
                   left: "50%",
-                  width: 10,
-                  height: 10,
+                  width: 9,
+                  height: 9,
                   borderRadius: "50%",
                   background: "#ED492F",
                   transform: `translate(-50%, -50%) scale(${pulseScale})`,
                   opacity: pulseOpacity,
                   boxShadow:
-                    "0 0 16px rgba(237,73,47,0.95), 0 0 36px rgba(237,73,47,0.35)",
+                    "0 0 14px rgba(237,73,47,0.95), 0 0 32px rgba(237,73,47,0.35)",
                 }}
               />
             );
@@ -565,18 +510,18 @@ export const HeroScene: React.FC = () => {
 
           {/* Bearing labels */}
           {[
-            { label: "000", style: { top: 10, left: "50%", transform: "translateX(-50%)" } },
-            { label: "090", style: { top: "50%", right: 10, transform: "translateY(-50%)" } },
-            { label: "180", style: { bottom: 10, left: "50%", transform: "translateX(-50%)" } },
-            { label: "270", style: { top: "50%", left: 10, transform: "translateY(-50%)" } },
+            { label: "000", style: { top: 8, left: "50%", transform: "translateX(-50%)" } },
+            { label: "090", style: { top: "50%", right: 8, transform: "translateY(-50%)" } },
+            { label: "180", style: { bottom: 8, left: "50%", transform: "translateX(-50%)" } },
+            { label: "270", style: { top: "50%", left: 8, transform: "translateY(-50%)" } },
           ].map(({ label, style }) => (
             <span
               key={label}
               style={{
                 position: "absolute",
                 fontFamily: "monospace",
-                fontSize: 9,
-                color: "rgba(255,255,255,0.25)",
+                fontSize: 8,
+                color: "rgba(255,255,255,0.22)",
                 letterSpacing: "0.18em",
                 ...style,
               }}
@@ -590,9 +535,9 @@ export const HeroScene: React.FC = () => {
         <div
           style={{
             position: "absolute",
-            bottom: 40,
-            left: 60,
-            right: 60,
+            bottom: 36,
+            left: 50,
+            right: 50,
             display: "flex",
             justifyContent: "space-between",
             opacity: hudOpacity,
@@ -607,7 +552,7 @@ export const HeroScene: React.FC = () => {
               <p
                 style={{
                   margin: 0,
-                  fontSize: 8,
+                  fontSize: 7,
                   fontFamily: "monospace",
                   letterSpacing: "0.22em",
                   textTransform: "uppercase",
@@ -619,9 +564,9 @@ export const HeroScene: React.FC = () => {
               <p
                 style={{
                   margin: 0,
-                  fontSize: 11,
+                  fontSize: 10,
                   fontFamily: "monospace",
-                  color: "rgba(255,255,255,0.38)",
+                  color: "rgba(255,255,255,0.35)",
                 }}
               >
                 {val}

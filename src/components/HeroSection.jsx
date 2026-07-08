@@ -5,11 +5,11 @@ import { trackContactClick, trackCtaClick } from '../lib/analytics'
 /* ── Radar constants ──────────────────────────────────────────── */
 
 // Blip positions in px offset from circle center.
-// Angles are clockwise from top; delays match sweep period (4 s).
+// Angles are clockwise from top (sweep ~4 s).
 const BLIPS = [
-  { xOff:  43, yOff: -51, delay: 0.44 }, // θ ≈ 40°
-  { xOff: -52, yOff:  91, delay: 2.33 }, // θ ≈ 210°
-  { xOff: -75, yOff: -27, delay: 3.22 }, // θ ≈ 290°
+  { xOff: 43, yOff: -51 },
+  { xOff: -52, yOff: 91 },
+  { xOff: -75, yOff: -27 },
 ]
 
 // 24 tick marks at 15° intervals around the outer ring (r = 182 px)
@@ -69,14 +69,13 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.18, duration: 0.75, ease: 'easeOut' }}
-              className="text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.03] tracking-tight text-balance drop-shadow-sm"
+              className="font-black text-white leading-[1.05] tracking-tight drop-shadow-sm"
+              style={{ fontSize: 'clamp(1.5rem, 2.6vw, 2.8rem)' }}
             >
-              Diseñados para
-              <br />
-              despegar fuerte
+              Evolución tecnológica real, construida con
               <br />
               <span className="text-brand-accent [text-shadow:0_0_56px_rgba(237,73,47,0.55)]">
-                y escalar rápido
+                ingeniería
               </span>
             </motion.h1>
 
@@ -113,15 +112,17 @@ export default function HeroSection() {
                 whileHover={{ scale: 1.04, boxShadow: '0 0 44px rgba(237,73,47,0.55)' }}
                 whileTap={{ scale: 0.97 }}
                 className="relative flex items-center gap-3 overflow-hidden rounded-2xl px-8 py-4 text-sm font-bold text-white"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative flex items-center gap-3 overflow-hidden rounded-2xl px-8 py-4 text-sm font-bold text-white transition-shadow duration-300 hover:shadow-[0_0_36px_rgba(237,73,47,0.45)]"
                 style={{
                   background: 'linear-gradient(135deg, #ED492F 0%, #c73520 60%, #9b2615 100%)',
                   boxShadow: '0 8px 32px -8px rgba(237,73,47,0.5), inset 0 1px 0 rgba(255,255,255,0.18)',
                 }}
               >
-                <motion.span
-                  className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
-                  animate={{ x: ['-100%', '220%'] }}
-                  transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 2.0, ease: 'easeInOut' }}
+                <span
+                  className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/18 to-transparent skew-x-12 animate-btn-shimmer"
+                  aria-hidden
                 />
                 <span>Hablar con el equipo</span>
                 <ArrowRight size={16} className="shrink-0" />
@@ -155,6 +156,9 @@ export default function HeroSection() {
                 { value: '3+',   label: 'Productos activos' },
                 { value: '100%', label: 'Ingeniería propia' },
                 { value: '4',    label: 'Cofundadores' },
+                { value: '3+',   label: 'Productos en desarrollo' },
+                { value: '100%', label: 'Ingeniería propia' },
+                { value: '4',    label: 'Co-fundadores' },
               ].map(({ value, label }) => (
                 <div key={label} className="flex flex-col gap-0.5">
                   <span className="text-xl font-black text-white">{value}</span>
@@ -252,53 +256,44 @@ export default function HeroSection() {
                 />
               ))}
 
-              {/* Sweep cone — self-clips to circle via rounded-full */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-                className="absolute inset-0 rounded-full pointer-events-none"
+              {/* Sweep cone — CSS animation (menos carga que Framer en bucle) */}
+              <div
+                className="animate-radar-spin absolute inset-0 rounded-full pointer-events-none"
                 style={{
                   background:
                     'conic-gradient(from 0deg, transparent 0deg, rgba(237,73,47,0.13) 52deg, transparent 52deg)',
                 }}
               />
 
-              {/* Sweep leading edge — thin bright line */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-                className="absolute inset-0 rounded-full pointer-events-none"
+              <div
+                className="animate-radar-spin absolute inset-0 rounded-full pointer-events-none"
                 style={{
                   background:
                     'conic-gradient(from 0deg, rgba(237,73,47,0.85) 0deg, transparent 2.5deg)',
                 }}
               />
 
-              {/* Blips — pulse in sync with sweep period (4 s) */}
-              {BLIPS.map(({ xOff, yOff, delay }, i) => (
-                <motion.div
+              {/* Blips estáticos: mismo look sin animación JS por frame */}
+              {BLIPS.map(({ xOff, yOff }, i) => (
+                <div
                   key={i}
                   className="absolute rounded-full pointer-events-none"
                   style={{
-                    width:  '7px',
+                    width: '7px',
                     height: '7px',
-                    top:    `calc(50% + ${yOff}px)`,
-                    left:   `calc(50% + ${xOff}px)`,
+                    top: `calc(50% + ${yOff}px)`,
+                    left: `calc(50% + ${xOff}px)`,
                     transform: 'translate(-50%, -50%)',
                     background: '#ED492F',
-                    boxShadow:  '0 0 10px rgba(237,73,47,0.9), 0 0 22px rgba(237,73,47,0.4)',
+                    boxShadow: '0 0 10px rgba(237,73,47,0.85), 0 0 20px rgba(237,73,47,0.35)',
+                    opacity: 0.92,
                   }}
-                  animate={{ opacity: [0, 1, 0.65, 0], scale: [0.4, 1.4, 1.0, 0.5] }}
-                  transition={{ duration: 0.8, repeat: Infinity, repeatDelay: 3.2, delay }}
                 />
               ))}
 
-              {/* Center pulsing dot */}
-              <motion.div
-                animate={{ scale: [1, 1.7, 1], opacity: [1, 0.45, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-brand-accent pointer-events-none"
-                style={{ boxShadow: '0 0 16px rgba(237,73,47,0.95), 0 0 36px rgba(237,73,47,0.35)' }}
+              <div
+                className="absolute top-1/2 left-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-accent opacity-95 animate-pulse pointer-events-none"
+                style={{ boxShadow: '0 0 14px rgba(237,73,47,0.85), 0 0 28px rgba(237,73,47,0.3)' }}
               />
 
               {/* Bearing labels */}

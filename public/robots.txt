@@ -1,0 +1,30 @@
+User-agent: *
+Allow: /
+
+# Imágenes del sitio (favicon / logo) — debe poder rastrear Googlebot-Image
+User-agent: Googlebot-Image
+Allow: /
+
+# AI Crawlers — permitir indexación para AI search
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://kondorcorporate.com/sitemap.xml

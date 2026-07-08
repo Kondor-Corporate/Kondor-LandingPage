@@ -29,6 +29,32 @@ const itemVariants = {
     x: 0,
     transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: i * 0.14 },
   }),
+    body:  'Somos una software factory que diseña y construye sistemas digitales para acompañar la evolución tecnológica de empresas en crecimiento.',
+    accent: false,
+  },
+  {
+    Icon:  Zap,
+    title: 'Cómo trabajamos',
+    body:  'Combinamos visión de producto, criterio técnico y buenas prácticas de ingeniería para construir soluciones claras, seguras y escalables.',
+    accent: true,
+  },
+  {
+    Icon:  Target,
+    title: 'Qué buscamos lograr',
+    body:  'Ayudamos a que organizaciones pequeñas y medianas operen con más estructura, visibilidad y capacidad de crecimiento.',
+    accent: false,
+  },
+]
+
+
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.16, delayChildren: 0.05 } },
+}
+
+const cardVariants = {
+  hidden:   { opacity: 0, y: 36 },
+  visible:  { opacity: 1, y: 0, transition: { duration: 0.65, ease: 'easeOut' } },
 }
 
 export default function AboutSection() {
@@ -39,6 +65,9 @@ export default function AboutSection() {
 
       <div className="relative max-w-6xl mx-auto px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row lg:items-start gap-16 lg:gap-24">
+    <section id="nosotros" className="relative py-20 lg:py-28 overflow-hidden">
+      {/* Top edge line */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
 
           {/* ── Left: sticky header ── */}
           <motion.div
@@ -67,6 +96,24 @@ export default function AboutSection() {
               <div className="w-2 h-2 rounded-full bg-brand-accent/40" />
             </div>
           </motion.div>
+        {/* Section header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.60 }}
+          className="mb-14 lg:mb-16"
+        >
+          <span className="inline-flex items-center gap-2 text-[11px] font-semibold text-brand-accent tracking-[0.22em] uppercase mb-5">
+            <span className="w-8 h-px bg-brand-accent/70" />
+            Nuestra identidad
+          </span>
+          <h2 className="text-3xl lg:text-4xl font-black text-white tracking-tight text-balance leading-tight">
+            Construimos con criterio,
+            <br className="hidden md:block" />
+            <span className="text-brand-accent"> no por improvisación.</span>
+          </h2>
+        </motion.div>
 
           {/* ── Right: items with vertical timeline ── */}
           <div className="relative flex-1">

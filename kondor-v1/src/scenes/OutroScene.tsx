@@ -14,125 +14,153 @@ const { fontFamily } = loadFont("normal", {
   subsets: ["latin"],
 });
 
-// Floating particles for outro
-const PARTICLES = Array.from({ length: 30 }, (_, i) => ({
-  x: ((i * 137.5) % 1920) - 960,
-  y: ((i * 97.3) % 1080) - 540,
-  size: 1 + (i % 3) * 0.8,
-  delay: i * 3,
-  driftX: (((i % 5) - 2) * 12),
-  driftY: -20 - (i % 8) * 6,
-  speed: 0.3 + (i % 5) * 0.1,
-}));
-
 export const OutroScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
-  const fadeIn = interpolate(frame, [0, fps * 0.4], [0, 1], {
+  // ── Global opacity ─────────────────────────────────────────────────────────
+  const fadeIn = interpolate(frame, [0, fps * 0.35], [0, 1], {
     extrapolateRight: "clamp",
   });
-
-  // Final fade out to black
   const fadeOut = interpolate(
     frame,
-    [durationInFrames - fps * 1.2, durationInFrames],
+    [durationInFrames - fps * 1.0, durationInFrames],
     [1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
-  // Logo spring entrance
+  // ── Glow pulse ─────────────────────────────────────────────────────────────
+  const glowCycle = (frame % (fps * 2.5)) / (fps * 2.5);
+  const glow = interpolate(glowCycle, [0, 0.5, 1], [0.45, 1, 0.45]);
+
+  // ── Logo spring ────────────────────────────────────────────────────────────
   const logoSpring = spring({
-    frame: frame - fps * 0.3,
+    frame: frame - fps * 0.2,
     fps,
-    config: { damping: 200 },
-    durationInFrames: fps * 1.2,
+    config: { damping: 230, stiffness: 72 },
+    durationInFrames: fps * 1.0,
   });
   const logoScale = interpolate(logoSpring, [0, 1], [0.6, 1]);
-  const logoOpacity = interpolate(logoSpring, [0, 1], [0, 1]);
+  const logoOp    = interpolate(logoSpring, [0, 1], [0, 1]);
 
-  // Glow pulse
-  const glowFrac = (frame % (fps * 2.5)) / (fps * 2.5);
-  const glow = interpolate(glowFrac, [0, 0.5, 1], [0.4, 1, 0.4]);
-
-  // URL entrance
-  const urlOpacity = interpolate(frame, [fps * 0.9, fps * 1.5], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
+  // ── CTA headline: "Visitanos en la web" ───────────────────────────────────
+  const ctaSpring = spring({
+    frame: frame - fps * 0.65,
+    fps,
+    config: { damping: 240, stiffness: 80 },
+    durationInFrames: fps * 0.85,
   });
-  const urlY = interpolate(frame, [fps * 0.9, fps * 1.5], [20, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  const ctaY  = interpolate(ctaSpring, [0, 1], [30, 0]);
+  const ctaOp = interpolate(ctaSpring, [0, 1], [0, 1]);
 
-  // Tagline
-  const taglineOpacity = interpolate(frame, [fps * 1.3, fps * 1.9], [0, 1], {
+  // ── Tagline (subline) ──────────────────────────────────────────────────────
+  const tagOp = interpolate(frame, [fps * 1.55, fps * 2.1], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Ring animations
-  const ring1Scale = spring({
-    frame: frame - fps * 0.1,
-    fps,
-    config: { damping: 60, stiffness: 50 },
-    durationInFrames: fps * 2,
-  });
-  const ring2Scale = spring({
-    frame: frame - fps * 0.3,
-    fps,
-    config: { damping: 60, stiffness: 40 },
-    durationInFrames: fps * 2,
-  });
-  const ring3Scale = spring({
-    frame: frame - fps * 0.5,
-    fps,
-    config: { damping: 60, stiffness: 35 },
-    durationInFrames: fps * 2,
+  // ── Separador horizontal animado ──────────────────────────────────────────
+  const sepWidth = interpolate(frame, [fps * 0.55, fps * 1.15], [0, 320], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
   });
 
-  // Particles drift
+  // ── Anillos ────────────────────────────────────────────────────────────────
+  const ring1 = spring({ frame: frame - fps * 0.05, fps, config: { damping: 58, stiffness: 40 }, durationInFrames: fps * 2 });
+  const ring2 = spring({ frame: frame - fps * 0.22, fps, config: { damping: 58, stiffness: 32 }, durationInFrames: fps * 2 });
+
+  // ── Partículas flotantes ───────────────────────────────────────────────────
+  const PARTICLES = Array.from({ length: 18 }, (_, i) => ({
+    x: ((i * 137.5) % 1920) - 960,
+    y: ((i * 91.3) % 1080) - 540,
+    size: 1 + (i % 3) * 0.65,
+    delay: i * 2.5,
+    driftX: ((i % 5) - 2) * 9,
+    driftY: -14 - (i % 7) * 4,
+    speed: 0.28 + (i % 5) * 0.07,
+  }));
   const particleProgress = interpolate(frame, [0, durationInFrames], [0, 1]);
+
+  // ── "Pill" que aparece con el CTA ─────────────────────────────────────────
+  const pillOp = interpolate(frame, [fps * 1.1, fps * 1.5], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const pillScale = spring({
+    frame: frame - fps * 1.1,
+    fps,
+    config: { damping: 220, stiffness: 100 },
+    durationInFrames: fps * 0.6,
+  });
 
   return (
     <AbsoluteFill
       style={{
-        backgroundColor: "#0d0d10",
+        backgroundColor: "#0a0a0e",
         opacity: fadeIn * fadeOut,
         fontFamily,
         overflow: "hidden",
       }}
     >
-      {/* Deep background radial */}
+      {/* ── Fondo radial ── */}
       <div
         style={{
           position: "absolute",
           inset: 0,
-          background: `radial-gradient(ellipse at 50% 50%, rgba(237,73,47,${0.2 * glow}) 0%, rgba(20,20,28,0.8) 40%, transparent 70%)`,
+          background: `radial-gradient(ellipse at 50% 45%,
+            rgba(237,73,47,${0.24 * glow}) 0%,
+            rgba(18,18,26,0.85) 36%,
+            rgba(10,10,14,1) 68%)`,
         }}
       />
 
-      {/* Subtle grid */}
+      {/* ── Grid ── */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
+            "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",
+          backgroundSize: "68px 68px",
         }}
       />
 
-      {/* Floating particles */}
+      {/* ── Glow esquinas ── */}
+      <div
+        style={{
+          position: "absolute",
+          top: -80,
+          right: -80,
+          width: 420,
+          height: 420,
+          borderRadius: "50%",
+          background: "rgba(237,73,47,0.1)",
+          filter: "blur(90px)",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          bottom: -60,
+          left: -60,
+          width: 340,
+          height: 340,
+          borderRadius: "50%",
+          background: "rgba(237,73,47,0.07)",
+          filter: "blur(80px)",
+        }}
+      />
+
+      {/* ── Partículas flotantes ── */}
       {PARTICLES.map((p, i) => {
-        const pOpacity = interpolate(
+        const pOp = interpolate(
           frame,
-          [p.delay, p.delay + fps * 0.6, durationInFrames - fps * 0.6],
-          [0, 0.6, 0],
+          [p.delay, p.delay + fps * 0.5, durationInFrames - fps * 0.5],
+          [0, 0.5, 0],
           { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
         );
-        const driftX = p.driftX * particleProgress;
-        const driftY = p.driftY * particleProgress * p.speed * 3;
+        const dx = p.driftX * particleProgress;
+        const dy = p.driftY * particleProgress * p.speed * 3;
         return (
           <div
             key={i}
@@ -144,136 +172,194 @@ export const OutroScene: React.FC = () => {
               height: p.size,
               borderRadius: "50%",
               background: "#ED492F",
-              opacity: pOpacity,
-              transform: `translate(calc(-50% + ${p.x + driftX}px), calc(-50% + ${p.y + driftY}px))`,
+              opacity: pOp,
+              transform: `translate(calc(-50% + ${p.x + dx}px), calc(-50% + ${p.y + dy}px))`,
               boxShadow: "0 0 4px rgba(237,73,47,0.8)",
             }}
           />
         );
       })}
 
-      {/* Expanding rings */}
+      {/* ── Anillos expansivos ── */}
       {[
-        { scale: ring1Scale, opacity: interpolate(ring1Scale, [0, 0.3, 1], [0, 0.3, 0]) },
-        { scale: ring2Scale * 1.4, opacity: interpolate(ring2Scale, [0, 0.3, 1], [0, 0.2, 0]) },
-        { scale: ring3Scale * 2.0, opacity: interpolate(ring3Scale, [0, 0.3, 1], [0, 0.15, 0]) },
-      ].map(({ scale, opacity }, i) => (
+        { s: ring1, base: 270, opFactor: 0.28 },
+        { s: ring2, base: 380, opFactor: 0.18 },
+      ].map(({ s, base, opFactor }, i) => (
         <div
           key={i}
           style={{
             position: "absolute",
             top: "50%",
             left: "50%",
-            width: 300,
-            height: 300,
+            width: base,
+            height: base,
             borderRadius: "50%",
-            border: "1px solid rgba(237,73,47,0.6)",
-            transform: `translate(-50%, -50%) scale(${scale})`,
-            opacity,
+            border: "1px solid rgba(237,73,47,0.55)",
+            transform: `translate(-50%, -50%) scale(${s})`,
+            opacity: interpolate(s, [0, 0.22, 1], [0, opFactor, 0]),
           }}
         />
       ))}
 
-      {/* Inner glow ring — static */}
+      {/* ── Anillo estático con breathing glow ── */}
       <div
         style={{
           position: "absolute",
           top: "50%",
           left: "50%",
-          width: 220,
-          height: 220,
+          width: 200,
+          height: 200,
           borderRadius: "50%",
-          border: "1px solid rgba(237,73,47,0.25)",
-          transform: `translate(-50%, -50%) scale(${logoSpring})`,
-          boxShadow: `0 0 ${50 * glow}px rgba(237,73,47,0.2)`,
+          border: "1px solid rgba(237,73,47,0.22)",
+          transform: `translate(-50%, -50%) scale(${ring1})`,
+          boxShadow: `0 0 ${52 * glow}px rgba(237,73,47,0.2)`,
         }}
       />
 
-      {/* Content */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 24,
-        }}
-      >
-        {/* Logo */}
+      {/* ── Contenido: titular en el centro vertical de la pantalla ── */}
+      <div style={{ position: "absolute", inset: 0 }}>
+        {/* Logo + línea arriba del titular (anclados al centro) */}
         <div
           style={{
-            opacity: logoOpacity,
-            transform: `scale(${logoScale})`,
-            filter: `drop-shadow(0 0 ${40 * glow}px rgba(237,73,47,0.7)) drop-shadow(0 0 80px rgba(237,73,47,0.3))`,
-          }}
-        >
-          <Img
-            src={staticFile("kondor.png")}
-            style={{ width: 220, height: "auto" }}
-          />
-        </div>
-
-        {/* URL */}
-        <div
-          style={{
-            opacity: urlOpacity,
-            transform: `translateY(${urlY}px)`,
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            transform: `translate(-50%, calc(-50% - 168px))`,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: 14,
           }}
         >
           <div
             style={{
-              width: 60,
+              opacity: logoOp,
+              transform: `scale(${logoScale})`,
+              filter: `drop-shadow(0 0 ${36 * glow}px rgba(237,73,47,0.75)) drop-shadow(0 0 80px rgba(237,73,47,0.28))`,
+              marginBottom: 20,
+            }}
+          >
+            <Img
+              src={staticFile("kondor.png")}
+              style={{ width: 200, height: "auto" }}
+            />
+          </div>
+          <div
+            style={{
+              width: sepWidth,
               height: 1,
               background:
                 "linear-gradient(90deg, transparent, rgba(237,73,47,0.7), transparent)",
             }}
           />
-          <p
-            style={{
-              margin: 0,
-              fontSize: 28,
-              fontWeight: 300,
-              color: "rgba(255,255,255,0.75)",
-              letterSpacing: "0.08em",
-            }}
-          >
-            kondor.dev
-          </p>
         </div>
 
-        {/* Tagline */}
+        {/* Titular anclado al centro vertical del frame */}
+        <div
+          style={{
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            transform: `translate(-50%, calc(-50% + ${ctaY}px))`,
+            opacity: ctaOp,
+            textAlign: "center",
+            width: "min(92vw, 1100px)",
+            padding: "0 24px",
+          }}
+        >
+          <h2
+            style={{
+              margin: 0,
+              fontSize: 44,
+              fontWeight: 900,
+              color: "white",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.12,
+            }}
+          >
+            El siguiente nivel empieza{" "}
+            <span
+              style={{
+                color: "#ED492F",
+                textShadow: "0 0 36px rgba(237,73,47,0.5)",
+              }}
+            >
+              hoy.
+            </span>
+          </h2>
+        </div>
+
+        {/* Pill CTA justo debajo del titular (mitad inferior del bloque centrado) */}
+        <div
+          style={{
+            position: "absolute",
+            left: "50%",
+            top: "calc(50% + 52px)",
+            transform: `translateX(-50%) scale(${0.8 + pillScale * 0.2})`,
+            opacity: pillOp,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 10,
+            background: "rgba(237,73,47,0.12)",
+            border: "1px solid rgba(237,73,47,0.45)",
+            borderRadius: 100,
+            padding: "10px 24px",
+          }}
+        >
+          <div
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: "#ED492F",
+              boxShadow: `0 0 ${8 * glow}px rgba(237,73,47,0.9)`,
+            }}
+          />
+          <span
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              color: "rgba(255,255,255,0.85)",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+            }}
+          >
+            Visitá nuestra web
+          </span>
+          <span style={{ color: "rgba(237,73,47,0.8)", fontSize: 14 }}>→</span>
+        </div>
+
+        {/* Tagline al pie */}
         <p
           style={{
-            opacity: taglineOpacity,
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 44,
+            opacity: tagOp,
             margin: 0,
-            fontSize: 13,
-            fontWeight: 600,
+            textAlign: "center",
+            fontSize: 11,
+            fontWeight: 400,
             letterSpacing: "0.3em",
             textTransform: "uppercase",
-            color: "rgba(255,255,255,0.35)",
+            color: "rgba(255,255,255,0.28)",
           }}
         >
           Ingeniería con criterio
         </p>
       </div>
 
-      {/* Corner marks */}
+      {/* ── HUD corners ── */}
       {[
-        { top: 32, left: 32 },
-        { top: 32, right: 32 },
-        { bottom: 32, left: 32 },
-        { bottom: 32, right: 32 },
+        { top: 36, left: 36 },
+        { top: 36, right: 36 },
+        { bottom: 36, left: 36 },
+        { bottom: 36, right: 36 },
       ].map((pos, i) => {
-        const cornerOpacity = interpolate(
+        const op = interpolate(
           frame,
-          [fps * 0.4 + i * 5, fps * 0.9 + i * 5, durationInFrames - fps * 0.8],
-          [0, 0.45, 0],
+          [fps * 0.4 + i * 4, fps * 0.9 + i * 4, durationInFrames - fps * 0.6],
+          [0, 0.4, 0],
           { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
         );
         return (
@@ -288,7 +374,7 @@ export const OutroScene: React.FC = () => {
               borderBottom: "top" in pos ? "none" : "1px solid rgba(237,73,47,0.55)",
               borderLeft: "right" in pos ? "none" : "1px solid rgba(237,73,47,0.55)",
               borderRight: "left" in pos ? "none" : "1px solid rgba(237,73,47,0.55)",
-              opacity: cornerOpacity,
+              opacity: op,
             }}
           />
         );

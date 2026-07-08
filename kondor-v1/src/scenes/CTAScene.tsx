@@ -12,79 +12,69 @@ const { fontFamily } = loadFont("normal", {
   subsets: ["latin"],
 });
 
-// Orbiting glow orbs
 const ORBS = [
-  { angle: 30, r: 400, size: 320, opacity: 0.12, speed: 0.008 },
-  { angle: 160, r: 360, size: 260, opacity: 0.1, speed: -0.006 },
-  { angle: 280, r: 420, size: 200, opacity: 0.08, speed: 0.005 },
+  { angle: 30, r: 380, size: 300, opacity: 0.11, speed: 0.007 },
+  { angle: 160, r: 340, size: 240, opacity: 0.09, speed: -0.005 },
+  { angle: 280, r: 400, size: 180, opacity: 0.07, speed: 0.004 },
 ];
 
 export const CTAScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
-  const fadeIn = interpolate(frame, [0, fps * 0.3], [0, 1], {
+  // Duración: 120 frames (4s)
+  const fadeIn = interpolate(frame, [0, fps * 0.25], [0, 1], {
     extrapolateRight: "clamp",
   });
   const fadeOut = interpolate(
     frame,
-    [durationInFrames - fps * 0.5, durationInFrames],
+    [durationInFrames - fps * 0.4, durationInFrames],
     [1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
-  // Tag
-  const tagOpacity = interpolate(frame, [fps * 0.2, fps * 0.7], [0, 1], {
+  const tagOpacity = interpolate(frame, [fps * 0.15, fps * 0.55], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Headline entrance
   const h2Spring = spring({
-    frame: frame - fps * 0.35,
+    frame: frame - fps * 0.28,
     fps,
-    config: { damping: 200 },
-    durationInFrames: fps * 1.0,
+    config: { damping: 220, stiffness: 90 },
+    durationInFrames: fps * 0.8,
   });
-  const h2Y = interpolate(h2Spring, [0, 1], [50, 0]);
+  const h2Y = interpolate(h2Spring, [0, 1], [44, 0]);
   const h2Opacity = interpolate(h2Spring, [0, 1], [0, 1]);
 
-  // Subtitle
-  const subOpacity = interpolate(frame, [fps * 0.9, fps * 1.5], [0, 1], {
+  const subOpacity = interpolate(frame, [fps * 0.75, fps * 1.2], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const subY = interpolate(frame, [fps * 0.9, fps * 1.5], [20, 0], {
+  const subY = interpolate(frame, [fps * 0.75, fps * 1.2], [18, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // CTA button
   const ctaScale = spring({
-    frame: frame - fps * 1.4,
+    frame: frame - fps * 1.1,
     fps,
-    config: { damping: 200 },
-    durationInFrames: fps * 0.6,
+    config: { damping: 220, stiffness: 90 },
+    durationInFrames: fps * 0.55,
   });
-  const ctaOpacity = interpolate(
-    frame,
-    [fps * 1.4, fps * 1.9],
-    [0, 1],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
-  );
-
-  // CTA pulse (button glow breathe)
-  const ctaPulseFrac = (frame % (fps * 2)) / (fps * 2);
-  const ctaGlow = interpolate(ctaPulseFrac, [0, 0.5, 1], [0.3, 0.7, 0.3]);
-
-  // Bottom note
-  const noteOpacity = interpolate(frame, [fps * 2.0, fps * 2.5], [0, 1], {
+  const ctaOpacity = interpolate(frame, [fps * 1.1, fps * 1.5], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Grid overlay opacity
-  const gridOpacity = 0.035;
+  // CTA glow breathe
+  const ctaPulseFrac = (frame % (fps * 2)) / (fps * 2);
+  const ctaGlow = interpolate(ctaPulseFrac, [0, 0.5, 1], [0.3, 0.75, 0.3]);
+
+  const noteOpacity = interpolate(frame, [fps * 1.5, fps * 2.0], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
 
   return (
     <AbsoluteFill
@@ -101,11 +91,11 @@ export const CTAScene: React.FC = () => {
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(ellipse at 72% 65%, rgba(237,73,47,0.92) 0%, rgba(180,45,22,0.55) 28%, rgba(30,30,36,1) 58%)",
+            "radial-gradient(ellipse at 72% 65%, rgba(237,73,47,0.88) 0%, rgba(180,45,22,0.5) 28%, rgba(30,30,36,1) 58%)",
         }}
       />
 
-      {/* Orbiting glow orbs */}
+      {/* Orbiting glows */}
       {ORBS.map((orb, i) => {
         const currentAngle =
           ((orb.angle + frame * orb.speed * 180) / Math.PI) * (Math.PI / 180);
@@ -130,29 +120,29 @@ export const CTAScene: React.FC = () => {
         );
       })}
 
-      {/* Additional corner glow */}
+      {/* Corner accent glows */}
       <div
         style={{
           position: "absolute",
-          top: -120,
-          right: -120,
-          width: 520,
-          height: 520,
+          top: -100,
+          right: -100,
+          width: 480,
+          height: 480,
           borderRadius: "50%",
-          background: "rgba(237,73,47,0.14)",
-          filter: "blur(100px)",
+          background: "rgba(237,73,47,0.13)",
+          filter: "blur(90px)",
         }}
       />
       <div
         style={{
           position: "absolute",
-          bottom: -100,
-          left: -100,
-          width: 380,
-          height: 380,
+          bottom: -90,
+          left: -90,
+          width: 360,
+          height: 360,
           borderRadius: "50%",
-          background: "rgba(237,73,47,0.1)",
-          filter: "blur(90px)",
+          background: "rgba(237,73,47,0.09)",
+          filter: "blur(80px)",
         }}
       />
 
@@ -164,7 +154,7 @@ export const CTAScene: React.FC = () => {
           backgroundImage:
             "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
           backgroundSize: "48px 48px",
-          opacity: gridOpacity,
+          opacity: 0.033,
         }}
       />
 
@@ -178,8 +168,8 @@ export const CTAScene: React.FC = () => {
           alignItems: "center",
           justifyContent: "center",
           padding: "0 200px",
-          gap: 0,
           textAlign: "center",
+          gap: 0,
         }}
       >
         {/* Tag */}
@@ -189,12 +179,10 @@ export const CTAScene: React.FC = () => {
             display: "flex",
             alignItems: "center",
             gap: 12,
-            marginBottom: 28,
+            marginBottom: 24,
           }}
         >
-          <div
-            style={{ width: 24, height: 1, background: "rgba(237,73,47,0.8)" }}
-          />
+          <div style={{ width: 22, height: 1, background: "rgba(237,73,47,0.8)" }} />
           <span
             style={{
               fontSize: 11,
@@ -206,41 +194,38 @@ export const CTAScene: React.FC = () => {
           >
             Conversemos
           </span>
-          <div
-            style={{ width: 24, height: 1, background: "rgba(237,73,47,0.8)" }}
-          />
+          <div style={{ width: 22, height: 1, background: "rgba(237,73,47,0.8)" }} />
         </div>
 
-        {/* Main headline */}
+        {/* Headline */}
         <div
           style={{
             opacity: h2Opacity,
             transform: `translateY(${h2Y}px)`,
-            marginBottom: 28,
+            marginBottom: 24,
           }}
         >
           <h2
             style={{
               margin: 0,
-              fontSize: 72,
+              fontSize: 68,
               fontWeight: 900,
               color: "white",
               lineHeight: 1.1,
               letterSpacing: "-0.025em",
             }}
           >
-            ¿Tu organización está lista
+            Construyamos el sistema que
             <br />
-            para el{" "}
+            tu organización{" "}
             <span
               style={{
                 color: "#ED492F",
-                textShadow: "0 0 40px rgba(237,73,47,0.45)",
+                textShadow: "0 0 38px rgba(237,73,47,0.45)",
               }}
             >
-              siguiente nivel
+              necesita
             </span>
-            ?
           </h2>
         </div>
 
@@ -249,25 +234,25 @@ export const CTAScene: React.FC = () => {
           style={{
             opacity: subOpacity,
             transform: `translateY(${subY}px)`,
-            margin: "0 0 40px",
-            fontSize: 18,
+            margin: "0 0 36px",
+            fontSize: 17,
             color: "rgba(255,255,255,0.6)",
-            lineHeight: 1.7,
-            maxWidth: 600,
+            lineHeight: 1.65,
+            maxWidth: 580,
           }}
         >
           Somos cuatro personas con criterio técnico y visión clara. Sin
           presentaciones largas: hablemos sobre lo que podemos construir juntos.
         </p>
 
-        {/* CTA Button */}
+        {/* CTA button */}
         <div
           style={{
             opacity: ctaOpacity,
-            transform: `scale(${0.7 + ctaScale * 0.3})`,
-            marginBottom: 32,
+            transform: `scale(${0.75 + ctaScale * 0.25})`,
+            marginBottom: 28,
             display: "flex",
-            gap: 16,
+            gap: 14,
             alignItems: "center",
           }}
         >
@@ -279,29 +264,14 @@ export const CTAScene: React.FC = () => {
               background: "#ED492F",
               color: "white",
               fontWeight: 700,
-              fontSize: 16,
-              padding: "16px 40px",
+              fontSize: 15,
+              padding: "14px 36px",
               borderRadius: 18,
-              boxShadow: `0 0 ${60 * ctaGlow}px rgba(237,73,47,0.5), 0 8px 32px rgba(237,73,47,0.35)`,
+              boxShadow: `0 0 ${56 * ctaGlow}px rgba(237,73,47,0.5), 0 8px 28px rgba(237,73,47,0.35)`,
             }}
           >
             Solicitar una conversación
-            <span style={{ fontSize: 18 }}>→</span>
-          </div>
-
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              color: "rgba(255,255,255,0.5)",
-              fontWeight: 500,
-              fontSize: 14,
-              padding: "16px 20px",
-              borderRadius: 14,
-            }}
-          >
-            Ver casos y recursos
+            <span style={{ fontSize: 17 }}>→</span>
           </div>
         </div>
 
@@ -310,12 +280,11 @@ export const CTAScene: React.FC = () => {
           style={{
             opacity: noteOpacity,
             margin: 0,
-            fontSize: 12,
-            color: "rgba(255,255,255,0.35)",
+            fontSize: 11,
+            color: "rgba(255,255,255,0.32)",
           }}
         >
-          Sin compromisos. Sin presentaciones largas. Solo una conversación
-          honesta.
+          Sin compromisos. Sin presentaciones largas. Solo una conversación honesta.
         </p>
       </div>
     </AbsoluteFill>

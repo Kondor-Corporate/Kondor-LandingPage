@@ -16,86 +16,132 @@ const pillars = [
     icon: Layers,
     title: 'Arquitectura escalable',
     n: '03',
+import { Layers, Cpu, TrendingUp, Network, Crosshair } from 'lucide-react'
+
+const pillars = [
+  {
+    icon: Cpu,
+    title: 'Ingeniería de criterio',
+    description: 'Tomamos decisiones técnicas basadas en evidencia, no en tendencias. Cada arquitectura refleja el problema real del negocio.',
+  },
+  {
+    icon: Layers,
+    title: 'Arquitectura escalable',
+    description: 'Diseñamos sistemas que crecen con tu organización. Modular, mantenible y preparado para los próximos años.',
+  },
+  {
+    icon: TrendingUp,
+    title: 'Evolución continua',
+    description: 'No entregamos software y desaparecemos. Acompañamos cada etapa del crecimiento con mejora iterativa.',
+  },
+  {
+    icon: Network,
+    title: 'Ecosistema integrado',
+    description: 'Conectamos todas las piezas: pagos, gestión, operación y datos en una plataforma cohesionada.',
   },
 ]
 
-const container = {
+const headerContainer = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.06 } },
+  visible: {
+    transition: { staggerChildren: 0.1, delayChildren: 0.04 },
+  },
 }
 
-const item = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } },
+const fadeUpShort = {
+  hidden: { opacity: 0, y: 8 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.48, ease: [0.22, 1, 0.36, 1] },
+  },
+}
+
+const pillarsContainer = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+  },
+}
+
+const pillarItem = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.42, ease: [0.22, 1, 0.36, 1] },
+  },
 }
 
 export default function VisionSection() {
   return (
     <section
       id="vision"
-      className="relative z-[30] overflow-hidden border-y border-white/10 bg-[#1E1E24]/50 backdrop-blur-2xl py-24 lg:py-32"
+      className="relative z-[30] overflow-hidden border-y border-white/10 bg-[#1E1E24]/50 py-28 backdrop-blur-md lg:py-36"
     >
-      <div className="pointer-events-none absolute top-0 inset-x-0 z-[2] h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
-      <div className="pointer-events-none absolute bottom-0 inset-x-0 z-[2] h-[2px] bg-gradient-to-r from-transparent via-brand-accent/40 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-px bg-gradient-to-r from-transparent via-brand-accent/35 to-transparent" />
 
-      <div className="absolute inset-0 bg-gradient-to-br from-brand-accent/5 via-transparent to-transparent pointer-events-none" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-brand-accent/[0.04] via-transparent to-transparent" />
 
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex flex-col gap-14 lg:gap-16">
-          {/* Bloque superior — ancho completo */}
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
+        <div className="flex flex-col gap-20 lg:gap-24">
+          {/* Bloque superior: etiqueta + titular + párrafo */}
           <motion.div
-            initial={{ opacity: 0, y: 22 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-70px' }}
-            transition={{ duration: 0.65 }}
+            variants={headerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
             className="w-full"
           >
-            <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
-              <div className="min-w-0 flex-1 max-w-3xl">
-                <div className="flex items-center gap-3 mb-8">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-brand-accent/35 bg-brand-accent/10 text-brand-accent">
+            <div className="flex flex-col gap-12 lg:flex-row lg:items-end lg:justify-between lg:gap-x-16 xl:gap-x-24">
+              <motion.div variants={fadeUpShort} className="min-w-0 max-w-[42rem] flex-1">
+                <div className="mb-9 flex items-center gap-3">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-brand-accent/30 bg-brand-accent/[0.08] text-brand-accent">
                     <Crosshair size={18} strokeWidth={1.75} />
                   </span>
-                  <span className="text-[10px] font-mono tracking-[0.28em] text-brand-accent/90 uppercase">
+                  <span className="text-[10px] font-mono uppercase tracking-[0.28em] text-brand-accent/90">
                     Nuestra visión
                   </span>
                 </div>
 
-                <div className="relative">
-                  <span className="absolute -left-1 -top-2 h-4 w-4 border-l-2 border-t-2 border-brand-accent/50" />
-                  <span className="absolute -right-1 -bottom-2 h-4 w-4 border-r-2 border-b-2 border-white/20" />
-
-                  <h2 className="text-4xl sm:text-5xl xl:text-[3.25rem] font-black text-white leading-[1.05] tracking-tight text-balance">
+                {/* Titular: acento lateral mínimo (sin esquinas tipo L); el texto manda */}
+                <div className="relative pl-5 sm:pl-6">
+                  <div
+                    className="absolute bottom-[0.2em] left-0 top-[0.2em] w-px rounded-full bg-gradient-to-b from-brand-accent/45 via-brand-accent/15 to-transparent"
+                    aria-hidden
+                  />
+                  <h2 className="text-4xl font-black leading-[1.06] tracking-tight text-balance text-white sm:text-5xl xl:text-[3.25rem]">
                     Tecnología{' '}
                     <span className="relative inline text-white">
                       real
                       <motion.span
-                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-brand-accent/20 via-brand-accent to-brand-accent/20 rounded-full"
+                        className="absolute -bottom-1 left-0 right-0 h-px rounded-full bg-gradient-to-r from-brand-accent/25 via-brand-accent/80 to-brand-accent/25"
                         initial={{ scaleX: 0, opacity: 0 }}
                         whileInView={{ scaleX: 1, opacity: 1 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 0.35, duration: 0.65, ease: 'easeOut' }}
+                        transition={{ delay: 0.28, duration: 0.55, ease: 'easeOut' }}
                         style={{ transformOrigin: 'left' }}
+                        aria-hidden
                       />
                     </span>
                     ,
                     <br />
                     construida con{' '}
                     <span className="relative inline-block">
-                      <span className="relative z-10 bg-gradient-to-br from-[#ff6b52] via-brand-accent to-[#9b2615] bg-clip-text text-transparent drop-shadow-[0_0_40px_rgba(237,73,47,0.35)]">
+                      <span className="relative z-10 bg-gradient-to-br from-[#ff6b52] via-brand-accent to-[#9b2615] bg-clip-text text-transparent">
                         rigor
                       </span>
-                      <motion.span
-                        className="pointer-events-none absolute -inset-2 -z-10 rounded-lg bg-brand-accent/35 blur-xl"
-                        animate={{ opacity: [0.32, 0.12, 0.32] }}
-                        transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+                      {/* Resplandor estático muy suave — sin animación continua */}
+                      <span
+                        className="pointer-events-none absolute -inset-1 -z-10 rounded-md bg-brand-accent/20 opacity-50 blur-lg"
                         aria-hidden
                       />
                     </span>
                     .
                   </h2>
                 </div>
-              </div>
+              </motion.div>
 
               <div className="flex shrink-0 flex-col gap-6 lg:max-w-md lg:text-right">
                 <p className="text-base lg:text-lg text-white/55 leading-relaxed border-l border-white/15 pl-5 lg:border-l-0 lg:border-r lg:pl-0 lg:pr-5">
@@ -104,69 +150,69 @@ export default function VisionSection() {
                   mucho más grandes.
                 </p>
               </div>
+              <motion.p
+                variants={fadeUpShort}
+                className="max-w-md shrink-0 text-base leading-relaxed text-white/[0.52] lg:max-w-sm lg:text-right lg:text-[1.05rem] lg:leading-relaxed"
+              >
+                Diseñamos sistemas para que empresas en crecimiento puedan operar con la claridad,
+                estructura y disciplina tecnológica que antes parecía reservada para organizaciones mucho más grandes.
+
+              </motion.p>
             </div>
           </motion.div>
 
-          {/* Tres focos — versión dinámica, icono + título */}
-          <motion.div
-            variants={container}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-40px' }}
-            className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-10"
-          >
-            {pillars.map((pillar) => {
-              const Icon = pillar.icon
-              return (
-                <motion.article
-                  key={pillar.title}
-                  variants={item}
-                  whileHover={{ y: -6, scale: 1.01 }}
-                  transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-                  className="group relative flex min-h-[92px] items-center gap-4 border-l border-white/12 pl-5 md:border-l-0 md:pl-0 md:pt-2"
-                >
-                  <div
-                    className="pointer-events-none absolute left-3 top-1/2 h-16 w-16 -translate-y-1/2 rounded-full bg-brand-accent/20 blur-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                    aria-hidden
-                  />
-                  <motion.span
-                    className="pointer-events-none absolute bottom-0 left-5 right-0 h-px bg-gradient-to-r from-brand-accent/70 via-brand-accent/20 to-transparent"
-                    initial={{ scaleX: 0, opacity: 0 }}
-                    whileInView={{ scaleX: 1, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.55, delay: 0.1 }}
-                    style={{ transformOrigin: 'left' }}
-                    aria-hidden
-                  />
-
-                  <div className="relative z-[1] flex h-12 w-12 shrink-0 items-center justify-center">
-                    <motion.span
-                      className="absolute inset-0 rounded-full border border-brand-accent/35"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
-                      aria-hidden
-                    />
-                    <motion.span
-                      className="absolute inset-[6px] rounded-full border border-dashed border-white/20"
-                      animate={{ rotate: -360 }}
-                      transition={{ duration: 14, repeat: Infinity, ease: 'linear' }}
-                      aria-hidden
-                    />
-                    <div className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[#26262f] text-white/90 ring-1 ring-white/10 transition-colors group-hover:text-brand-accent group-hover:ring-brand-accent/35">
-                      <Icon size={16} strokeWidth={1.8} />
+          {/* Pilares: composición con intención — fila generosa, base liviana, sin cards pesadas */}
+          <div className="relative">
+            <div
+              className="pointer-events-none absolute -top-10 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent md:-top-12"
+              aria-hidden
+            />
+            <motion.div
+              variants={pillarsContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-40px' }}
+              className="mx-auto grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4"
+            >
+              {pillars.map((pillar) => {
+                const Icon = pillar.icon
+                return (
+                  <motion.article
+                    key={pillar.title}
+                    variants={pillarItem}
+                    className="relative flex gap-5 md:flex-col md:gap-5"
+                  >
+                    <div className="flex shrink-0 items-center justify-center md:items-start md:justify-start">
+                      <motion.span
+                        className="relative inline-flex cursor-default text-brand-accent"
+                        whileHover={{
+                          y: -7,
+                          transition: { type: 'spring', stiffness: 440, damping: 26, mass: 0.85 },
+                        }}
+                      >
+                        <Icon
+                          className="h-11 w-11 sm:h-12 sm:w-12"
+                          strokeWidth={1.25}
+                          aria-hidden
+                        />
+                      </motion.span>
                     </div>
-                  </div>
 
-                  <div className="relative z-[1] min-w-0 flex-1">
-                    <p className="mb-1 font-mono text-[10px] tracking-[0.2em] text-brand-accent/75">{pillar.n}</p>
-                    <h3 className="text-base font-bold tracking-tight text-white transition-colors duration-300 group-hover:text-brand-accent sm:text-lg">
-                      {pillar.title}
-                    </h3>
-                  </div>
-                </motion.article>
-              )
-            })}
-          </motion.div>
+                    <div className="min-w-0 flex-1 md:flex-none">
+                      <h3 className="text-[1.2rem] font-bold leading-snug tracking-tight text-white sm:text-xl md:text-[1.35rem] md:leading-tight">
+                        {pillar.title}
+                      </h3>
+                      {pillar.description && (
+                        <p className="mt-2 text-sm leading-relaxed text-white/45">
+                          {pillar.description}
+                        </p>
+                      )}
+                    </div>
+                  </motion.article>
+                )
+              })}
+            </motion.div>
+          </div>
         </div>
       </div>
     </section>

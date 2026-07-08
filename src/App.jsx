@@ -49,6 +49,32 @@ export default function App() {
         ctaOrigin={contactFormOrigin}
         onClose={() => setIsContactFormOpen(false)}
       />
+import LegalModal from './components/LegalModal'
+
+export default function App() {
+  const [isContactFormOpen, setIsContactFormOpen] = useState(false)
+  const [legalType, setLegalType] = useState(null)
+
+  return (
+    <div className="min-h-screen overflow-x-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: 'easeOut' }}
+      >
+        <Navbar onOpenContactForm={() => setIsContactFormOpen(true)} />
+        <main>
+          <HeroSection />
+          <AboutSection />
+          <VisionSection />
+          <PortfolioSection />
+          <TeamSection />
+          <CTASection onOpenContactForm={() => setIsContactFormOpen(true)} />
+        </main>
+        <Footer onOpenLegal={(type) => setLegalType(type)} />
+        <ContactFormModal open={isContactFormOpen} onClose={() => setIsContactFormOpen(false)} />
+        <LegalModal type={legalType} onClose={() => setLegalType(null)} />
+      </motion.div>
     </div>
   )
 }

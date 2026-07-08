@@ -1,0 +1,39 @@
+# Kondor — Software Factory
+
+> Kondor es una software factory argentina fundada en 2024 que diseña y construye sistemas digitales para pequeñas y medianas empresas en crecimiento.
+
+## About
+
+Kondor combina visión de producto, criterio técnico y buenas prácticas de ingeniería para construir soluciones claras, seguras y escalables. Ayudamos a que organizaciones pequeñas y medianas operen con más estructura, visibilidad y capacidad de crecimiento, con la claridad y disciplina tecnológica que antes parecía reservada para organizaciones mucho más grandes.
+
+## Services
+
+- Desarrollo de software a medida
+- Arquitectura de sistemas escalables y seguros
+- Consultoría tecnológica y estrategia digital
+- Plataformas de gestión para pymes
+- Sistemas de pagos y comercialización
+- Plataformas SaaS
+- Sistemas de control y operación para clubes e instituciones
+
+## Products & Clients
+
+- **Maps Organización**: plataforma en partnership activo
+- **Club de campo La Federala**: sistema de comercialización y control
+- **Club For Ever**: sistema de pagos y gestión
+- **TakeOff** (próximamente): planificador de viajes inteligente
+
+## Team
+
+- **Lucas Legorburu** — CEO & Co-Fundador: define la estrategia y alinea prioridades de negocio con la capacidad de ejecución del equipo
+- **Joaquín E. Rodríguez** — COO & Co-Fundador: combina visión de negocio y ejecución, convierte ideas ambiciosas en entregables concretos
+- **Nicolás Pérez** — CTO & Co-Fundador: apasionado por la calidad y la experiencia, diseña flujos que la gente realmente usa
+- **Santiago Talavera** — CMO & Co-Fundador: operación y crecimiento, hace que el mercado entienda el valor en segundos
+
+## Contact
+
+- Website: https://kondorcorporate.com
+- Email: kondorcorporate@gmail.com
+- LinkedIn: https://www.linkedin.com/company/kondorcorporate/
+- Instagram: https://www.instagram.com/kondor.io/
+- TikTok: https://www.tiktok.com/@kondor.io

@@ -12,74 +12,65 @@ const { fontFamily } = loadFont("normal", {
   subsets: ["latin"],
 });
 
+// Alineado con VisionSection.jsx — pilares sin body text
 const PILLARS = [
-  {
-    title: "Ingeniería de criterio",
-    body: "Cada sistema se diseña y construye con buenas prácticas, sin atajos. Aplicamos estándares de ingeniería reales en cada capa del producto.",
-  },
-  {
-    title: "Marca madre",
-    body: "Kondor es la empresa detrás de distintos productos y verticales. No somos un solo producto: somos la plataforma que los hace posibles.",
-  },
-  {
-    title: "Evolución continua",
-    body: "Acompañamos a las organizaciones en su transformación tecnológica para que puedan operar con el nivel de una gran corporación.",
-  },
+  { title: "Ingeniería de criterio", n: "01" },
+  { title: "Arquitectura escalable", n: "02" },
+  { title: "Evolución continua", n: "03" },
+  { title: "Ecosistema integrado", n: "04" },
 ];
 
 export const VisionScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
-  const fadeIn = interpolate(frame, [0, fps * 0.3], [0, 1], {
+  // Duración: 120 frames (4s)
+  const fadeIn = interpolate(frame, [0, fps * 0.25], [0, 1], {
     extrapolateRight: "clamp",
   });
   const fadeOut = interpolate(
     frame,
-    [durationInFrames - fps * 0.5, durationInFrames],
+    [durationInFrames - fps * 0.4, durationInFrames],
     [1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
-  // Header
-  const headerOpacity = interpolate(frame, [fps * 0.2, fps * 0.8], [0, 1], {
+  const headerOpacity = interpolate(frame, [fps * 0.15, fps * 0.65], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const headerY = interpolate(frame, [fps * 0.2, fps * 0.8], [30, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
-  // Right subtitle
-  const subOpacity = interpolate(frame, [fps * 0.6, fps * 1.2], [0, 1], {
+  const headerY = interpolate(frame, [fps * 0.15, fps * 0.65], [28, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Pillar animations
+  const subOpacity = interpolate(frame, [fps * 0.5, fps * 1.0], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
   const pillarAnimations = PILLARS.map((_, i) => {
-    const delay = fps * (0.8 + i * 0.22);
+    const delay = fps * (0.65 + i * 0.18);
     const s = spring({
       frame: frame - delay,
       fps,
-      config: { damping: 200 },
-      durationInFrames: fps * 0.8,
+      config: { damping: 220, stiffness: 90 },
+      durationInFrames: fps * 0.7,
     });
     return {
-      y: interpolate(s, [0, 1], [50, 0]),
+      y: interpolate(s, [0, 1], [40, 0]),
       opacity: interpolate(s, [0, 1], [0, 1]),
     };
   });
 
-  // Bottom divider
-  const dividerOpacity = interpolate(frame, [fps * 2.0, fps * 2.5], [0, 1], {
+  // Linea accent inferior animada
+  const accentLineWidth = interpolate(frame, [fps * 0.4, fps * 1.2], [0, 100], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Accent bottom line width
-  const accentLineWidth = interpolate(frame, [fps * 0.5, fps * 1.5], [0, 100], {
+  // Underline de "rigor" que se revela
+  const underlineScale = interpolate(frame, [fps * 0.55, fps * 1.1], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -93,21 +84,20 @@ export const VisionScene: React.FC = () => {
         overflow: "hidden",
       }}
     >
-      {/* Background */}
+      {/* Background glass blur */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(ellipse at 72% 65%, rgba(237,73,47,0.92) 0%, rgba(180,45,22,0.55) 28%, rgba(30,30,36,1) 58%)",
+            "radial-gradient(ellipse at 72% 65%, rgba(237,73,47,0.85) 0%, rgba(180,45,22,0.5) 28%, rgba(30,30,36,1) 58%)",
         }}
       />
       <div
         style={{
           position: "absolute",
           inset: 0,
-          background:
-            "linear-gradient(135deg, rgba(237,73,47,0.05) 0%, transparent 50%)",
+          background: "linear-gradient(135deg, rgba(237,73,47,0.04) 0%, transparent 50%)",
         }}
       />
 
@@ -120,7 +110,7 @@ export const VisionScene: React.FC = () => {
           height: 2,
           width: `${accentLineWidth}%`,
           background:
-            "linear-gradient(90deg, transparent, rgba(237,73,47,0.4), transparent)",
+            "linear-gradient(90deg, transparent, rgba(237,73,47,0.45), transparent)",
         }}
       />
 
@@ -142,7 +132,7 @@ export const VisionScene: React.FC = () => {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "flex-end",
-            marginBottom: 64,
+            marginBottom: 56,
             gap: 40,
           }}
         >
@@ -152,12 +142,10 @@ export const VisionScene: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 gap: 10,
-                marginBottom: 16,
+                marginBottom: 14,
               }}
             >
-              <div
-                style={{ width: 32, height: 1, background: "#ED492F" }}
-              />
+              <div style={{ width: 28, height: 1, background: "#ED492F" }} />
               <span
                 style={{
                   fontSize: 11,
@@ -170,49 +158,70 @@ export const VisionScene: React.FC = () => {
                 Nuestra visión
               </span>
             </div>
-            <h2
-              style={{
-                margin: 0,
-                fontSize: 60,
-                fontWeight: 900,
-                color: "white",
-                lineHeight: 1.1,
-                letterSpacing: "-0.02em",
-              }}
-            >
-              Tecnología real,
-              <br />
-              construida con{" "}
-              <span style={{ color: "#ED492F" }}>rigor</span>.
-            </h2>
+            <div style={{ position: "relative" }}>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: 56,
+                  fontWeight: 900,
+                  color: "white",
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                Tecnología real,
+                <br />
+                construida con{" "}
+                <span style={{ color: "#ED492F", position: "relative" }}>
+                  rigor
+                </span>
+                .
+              </h2>
+              {/* Underline animado bajo "rigor" */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 4,
+                  right: 12,
+                  width: 88,
+                  height: 2,
+                  borderRadius: 2,
+                  background:
+                    "linear-gradient(90deg, rgba(237,73,47,0.2), #ED492F, rgba(237,73,47,0.2))",
+                  transformOrigin: "left",
+                  transform: `scaleX(${underlineScale})`,
+                }}
+              />
+            </div>
           </div>
 
           <p
             style={{
               margin: 0,
-              fontSize: 16,
+              fontSize: 15,
               color: "rgba(255,255,255,0.6)",
               lineHeight: 1.7,
-              maxWidth: 360,
+              maxWidth: 340,
               textAlign: "right",
               opacity: subOpacity,
+              borderRight: "3px solid rgba(255,255,255,0.13)",
+              paddingRight: 20,
             }}
           >
-            Somos cuatro personas con criterio técnico claro. Creamos sistemas
-            para que las medianas organizaciones puedan operar como grandes
-            corporaciones.
+            Diseñamos sistemas para que empresas en crecimiento operen con la
+            claridad y disciplina tecnológica de organizaciones mucho más grandes.
           </p>
         </div>
 
-        {/* Pillars */}
+        {/* Pilares — diseño dinámico (logo + número + título sin body) */}
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            gap: 24,
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr 1fr",
+          gap: 20,
           }}
         >
-          {PILLARS.map(({ title, body }, i) => {
+          {PILLARS.map(({ title, n }, i) => {
             const { y, opacity } = pillarAnimations[i];
             return (
               <div
@@ -220,94 +229,80 @@ export const VisionScene: React.FC = () => {
                 style={{
                   opacity,
                   transform: `translateY(${y}px)`,
-                  position: "relative",
-                  borderRadius: 20,
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  background: "rgba(255,255,255,0.06)",
-                  backdropFilter: "blur(12px)",
-                  padding: "36px 32px",
-                  overflow: "hidden",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 16,
+                  borderLeft: "1px solid rgba(255,255,255,0.12)",
+                  paddingLeft: 20,
+                  paddingTop: 8,
+                  paddingBottom: 8,
                 }}
               >
-                {/* Icon circle */}
+                {/* Icon orbit */}
                 <div
                   style={{
+                    position: "relative",
                     width: 48,
                     height: 48,
-                    borderRadius: 14,
-                    background: "rgba(237,73,47,0.15)",
-                    border: "1px solid rgba(237,73,47,0.2)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: 24,
-                    fontSize: 20,
-                    color: "#ED492F",
+                    flexShrink: 0,
                   }}
                 >
-                  {i === 0 ? "⬡" : i === 1 ? "⬢" : "↑"}
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      borderRadius: "50%",
+                      border: "1px solid rgba(237,73,47,0.4)",
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: "5px",
+                      borderRadius: "50%",
+                      border: "1px dashed rgba(237,73,47,0.2)",
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: "8px",
+                      borderRadius: "50%",
+                      background: "rgba(237,73,47,0.1)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  />
                 </div>
 
-                <h3
-                  style={{
-                    margin: "0 0 12px",
-                    fontSize: 18,
-                    fontWeight: 700,
-                    color: "white",
-                  }}
-                >
-                  {title}
-                </h3>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 14,
-                    color: "rgba(255,255,255,0.55)",
-                    lineHeight: 1.7,
-                  }}
-                >
-                  {body}
-                </p>
+                <div>
+                  <p
+                    style={{
+                      margin: "0 0 4px",
+                      fontFamily: "monospace",
+                      fontSize: 10,
+                      color: "rgba(237,73,47,0.8)",
+                      letterSpacing: "0.2em",
+                    }}
+                  >
+                    {n}
+                  </p>
+                  <h3
+                    style={{
+                      margin: 0,
+                      fontSize: 16,
+                      fontWeight: 700,
+                      color: "white",
+                      letterSpacing: "-0.01em",
+                    }}
+                  >
+                    {title}
+                  </h3>
+                </div>
               </div>
             );
           })}
-        </div>
-
-        {/* Bottom note */}
-        <div
-          style={{
-            opacity: dividerOpacity,
-            marginTop: 40,
-            paddingTop: 24,
-            borderTop: "1px solid rgba(255,255,255,0.1)",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <p
-            style={{
-              margin: 0,
-              fontSize: 12,
-              color: "rgba(255,255,255,0.4)",
-              maxWidth: 480,
-              lineHeight: 1.7,
-            }}
-          >
-            Nuestro foco inicial son las agencias de productores de seguros,
-            pero nuestra visión es más amplia: cualquier organización que
-            quiera dar el salto tecnológico.
-          </p>
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: "#ED492F",
-              letterSpacing: "0.02em",
-            }}
-          >
-            Ver nuestros sistemas →
-          </span>
         </div>
       </div>
     </AbsoluteFill>

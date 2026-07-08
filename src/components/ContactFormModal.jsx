@@ -1,10 +1,56 @@
 import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, Send } from 'lucide-react'
 import { trackLeadFormSubmit } from '../lib/analytics'
 import { hasLeadIngestionEndpoint, persistLeadFromContactForm } from '../lib/leadCapture'
+import { CheckCircle2, Send, X } from 'lucide-react'
 
-const DEFAULT_FORMSPREE_ENDPOINT = 'https://formspree.io/f/xblovokz'
+const DEFAULT_FORMSPREE_ENDPOINT = 'https://formspree.io/f/xvzvdypk'
+
+const contactFormSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, { message: 'Este campo es obligatorio.' })
+    .min(2, { message: 'Ingresá al menos 2 caracteres.' })
+    .max(120, { message: 'El nombre es demasiado largo.' }),
+  email: z
+    .string()
+    .trim()
+    .min(1, { message: 'Este campo es obligatorio.' })
+    .email({ message: 'Ingresá un email válido.' }),
+  company: z
+    .string()
+    .trim()
+    .min(1, { message: 'Este campo es obligatorio.' })
+    .min(2, { message: 'Ingresá el nombre de la empresa o equipo.' })
+    .max(200, { message: 'Este campo admite como máximo 200 caracteres.' }),
+  message: z
+    .string()
+    .trim()
+    .min(1, { message: 'Este campo es obligatorio.' })
+    .max(8000, { message: 'El mensaje es demasiado largo.' }),
+  website: z.string().optional(),
+})
+
+const defaultFormValues = {
+  name: '',
+  email: '',
+  company: '',
+  message: '',
+  website: '',
+}
+
+function inputClassName(hasError) {
+  const base =
+    'w-full rounded-xl border bg-white/[0.04] px-3 text-sm text-white outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-white/30 focus:ring-0'
+  return hasError
+    ? `${base} border-[#c94a3d]/80 ring-1 ring-[#e85d4a]/35 focus:border-[#d95545]`
+    : `${base} border-white/12 focus:border-brand-accent/60`
+}
 
 export default function ContactFormModal({ open, ctaOrigin, onClose }) {
   const [form, setForm] = useState({
@@ -14,6 +60,8 @@ export default function ContactFormModal({ open, ctaOrigin, onClose }) {
     message: '',
     website: '',
   })
+export default function ContactFormModal({ open, onClose }) {
+  const [view, setView] = useState('form')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState('idle')
   const [submitMessage, setSubmitMessage] = useState('')
@@ -45,6 +93,18 @@ export default function ContactFormModal({ open, ctaOrigin, onClose }) {
       throw new Error('formspree_notification_failed')
     }
   }
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(contactFormSchema),
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+    criteriaMode: 'all',
+    defaultValues: defaultFormValues,
+  })
 
   useEffect(() => {
     if (!open) return
@@ -65,17 +125,11 @@ export default function ContactFormModal({ open, ctaOrigin, onClose }) {
 
   useEffect(() => {
     if (!open) return
+    setView('form')
     setSubmitStatus('idle')
     setSubmitMessage('')
-  }, [open])
-
-  const handleChange = (event) => {
-    const { name, value } = event.target
-    setForm((current) => ({ ...current, [name]: value }))
-  }
-
-  const handleSubmit = async (event) => {
-    event.preventDefault()
+    reset(defaultFormValues)
+  }, [open, reset])
 
     // Honeypot anti-spam: bots often complete hidden fields.
     if (form.website.trim()) {
@@ -85,19 +139,22 @@ export default function ContactFormModal({ open, ctaOrigin, onClose }) {
       })
       setSubmitStatus('success')
       setSubmitMessage('Mensaje enviado. Te responderemos pronto.')
+  const onValidSubmit = async (data) => {
+    if (data.website?.trim()) {
+      setView('success')
       return
     }
 
     const payloadHash = JSON.stringify({
-      name: form.name.trim(),
-      email: form.email.trim(),
-      company: form.company.trim(),
-      message: form.message.trim(),
+      name: data.name.trim(),
+      email: data.email.trim(),
+      company: (data.company || '').trim(),
+      message: data.message.trim(),
     })
 
     if (payloadHash === lastSubmittedHash) {
       setSubmitStatus('error')
-      setSubmitMessage('Ya recibimos este mensaje. Si deseas reenviar, cambia algún campo.')
+      setSubmitMessage('Ya recibimos este mensaje. Si querés reenviar, cambiá algún campo.')
       return
     }
 
@@ -107,6 +164,21 @@ export default function ContactFormModal({ open, ctaOrigin, onClose }) {
 
     try {
       const usesBusinessPersistence = hasLeadIngestionEndpoint()
+      const response = await fetch(formEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          company: data.company || '',
+          message: data.message,
+          _subject: `Nuevo contacto desde landing - ${data.name}`,
+          _gotcha: data.website || '',
+        }),
+      })
 
       if (usesBusinessPersistence) {
         await persistLeadFromContactForm(form, ctaOrigin)
@@ -117,8 +189,6 @@ export default function ContactFormModal({ open, ctaOrigin, onClose }) {
         await notifyFormspree()
       }
 
-      setSubmitStatus('success')
-      setSubmitMessage('Mensaje enviado. Te responderemos pronto.')
       setLastSubmittedHash(payloadHash)
       trackLeadFormSubmit({
         form_id: 'contact_modal',
@@ -128,6 +198,8 @@ export default function ContactFormModal({ open, ctaOrigin, onClose }) {
         has_message: Boolean(form.message.trim()),
       })
       setForm({ name: '', email: '', company: '', message: '', website: '' })
+      reset(defaultFormValues)
+      setView('success')
     } catch (error) {
       trackLeadFormSubmit({
         form_id: 'contact_modal',
@@ -135,7 +207,7 @@ export default function ContactFormModal({ open, ctaOrigin, onClose }) {
         error_message: error?.message || 'unknown',
       })
       setSubmitStatus('error')
-      setSubmitMessage(error?.message || 'No pudimos enviar el mensaje. Intenta nuevamente en unos minutos.')
+      setSubmitMessage(error?.message || 'No pudimos enviar el mensaje. Intentá nuevamente en unos minutos.')
     } finally {
       setIsSubmitting(false)
     }
@@ -172,7 +244,7 @@ export default function ContactFormModal({ open, ctaOrigin, onClose }) {
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-accent">Conversemos</p>
                   <h3 className="mt-2 text-2xl font-black tracking-tight text-white sm:text-3xl">
-                    Cuéntanos qué quieres construir
+                    Cuéntanos qué querés construir
                   </h3>
                   <p className="mt-2 text-sm text-white/55">
                     Te respondemos por correo y coordinamos una conversación breve.
@@ -188,68 +260,143 @@ export default function ContactFormModal({ open, ctaOrigin, onClose }) {
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <label className="block">
-                    <span className="mb-1.5 block text-xs font-medium text-white/70">Nombre</span>
+              <AnimatePresence mode="wait">
+                {view === 'success' ? (
+                  <motion.div
+                    key="success"
+                    role="status"
+                    aria-live="polite"
+                    initial={{ opacity: 0, y: 8, scale: 0.985 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -6, scale: 0.99 }}
+                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    className="flex flex-col items-center px-2 py-10 text-center sm:px-6"
+                  >
+                    <motion.div
+                      initial={{ scale: 0.85, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.06, duration: 0.35, ease: 'easeOut' }}
+                      className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-emerald-500/25 bg-emerald-500/10 shadow-[0_0_40px_-12px_rgba(52,211,153,0.35)]"
+                    >
+                      <CheckCircle2 className="h-8 w-8 text-emerald-400/95" strokeWidth={1.75} aria-hidden />
+                    </motion.div>
+                    <p className="text-lg font-semibold tracking-tight text-white">Mensaje enviado correctamente</p>
+                    <p className="mt-2 max-w-sm text-sm leading-relaxed text-white/55">
+                      Te responderemos pronto por correo
+                    </p>
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      className="mt-8 inline-flex min-w-[140px] items-center justify-center rounded-2xl border border-white/14 bg-white/[0.06] px-6 py-2.5 text-sm font-semibold text-white/90 transition-colors hover:border-white/22 hover:bg-white/[0.09]"
+                    >
+                      Cerrar
+                    </button>
+                  </motion.div>
+                ) : (
+                  <motion.form
+                    key="form"
+                    noValidate
+                    onSubmit={handleSubmit(onValidSubmit)}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-4"
+                  >
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div className="block">
+                        <label htmlFor="contact-name" className="block">
+                          <span className="mb-1.5 block text-xs font-medium text-white/70">Nombre</span>
+                          <input
+                            id="contact-name"
+                            type="text"
+                            autoComplete="name"
+                            aria-invalid={errors.name ? 'true' : 'false'}
+                            aria-describedby={errors.name ? 'contact-name-error' : undefined}
+                            className={`h-11 ${inputClassName(!!errors.name)}`}
+                            placeholder="Tu nombre"
+                            {...register('name')}
+                          />
+                        </label>
+                        {errors.name && (
+                          <p id="contact-name-error" className="mt-1.5 text-xs text-[#f0a89e]/95" role="alert">
+                            {errors.name.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="block">
+                        <label htmlFor="contact-email" className="block">
+                          <span className="mb-1.5 block text-xs font-medium text-white/70">Email</span>
+                          <input
+                            id="contact-email"
+                            type="email"
+                            autoComplete="email"
+                            inputMode="email"
+                            aria-invalid={errors.email ? 'true' : 'false'}
+                            aria-describedby={errors.email ? 'contact-email-error' : undefined}
+                            className={`h-11 ${inputClassName(!!errors.email)}`}
+                            placeholder="tu@email.com"
+                            {...register('email')}
+                          />
+                        </label>
+                        {errors.email && (
+                          <p id="contact-email-error" className="mt-1.5 text-xs text-[#f0a89e]/95" role="alert">
+                            {errors.email.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="block">
+                      <label htmlFor="contact-company" className="block">
+                        <span className="mb-1.5 block text-xs font-medium text-white/70">Empresa / organización</span>
+                        <input
+                          id="contact-company"
+                          type="text"
+                          autoComplete="organization"
+                          aria-invalid={errors.company ? 'true' : 'false'}
+                          aria-describedby={errors.company ? 'contact-company-error' : undefined}
+                          className={`h-11 ${inputClassName(!!errors.company)}`}
+                          placeholder="Nombre de la organización"
+                          {...register('company')}
+                        />
+                      </label>
+                      {errors.company && (
+                        <p id="contact-company-error" className="mt-1.5 text-xs text-[#f0a89e]/95" role="alert">
+                          {errors.company.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="block">
+                      <label htmlFor="contact-message" className="block">
+                        <span className="mb-1.5 block text-xs font-medium text-white/70">Mensaje</span>
+                        <textarea
+                          id="contact-message"
+                          rows={5}
+                          aria-invalid={errors.message ? 'true' : 'false'}
+                          aria-describedby={errors.message ? 'contact-message-error' : undefined}
+                          className={`resize-y py-2.5 ${inputClassName(!!errors.message)}`}
+                          placeholder="Cuéntanos brevemente objetivo, contexto y urgencia."
+                          {...register('message')}
+                        />
+                      </label>
+                      {errors.message && (
+                        <p id="contact-message-error" className="mt-1.5 text-xs text-[#f0a89e]/95" role="alert">
+                          {errors.message.message}
+                        </p>
+                      )}
+                    </div>
+
                     <input
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      required
-                      className="h-11 w-full rounded-xl border border-white/12 bg-white/[0.04] px-3 text-sm text-white outline-none transition-colors placeholder:text-white/30 focus:border-brand-accent/60"
-                      placeholder="Tu nombre"
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      className="hidden"
+                      aria-hidden="true"
+                      {...register('website')}
                     />
-                  </label>
-
-                  <label className="block">
-                    <span className="mb-1.5 block text-xs font-medium text-white/70">Email</span>
-                    <input
-                      type="email"
-                      name="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      required
-                      className="h-11 w-full rounded-xl border border-white/12 bg-white/[0.04] px-3 text-sm text-white outline-none transition-colors placeholder:text-white/30 focus:border-brand-accent/60"
-                      placeholder="tu@email.com"
-                    />
-                  </label>
-                </div>
-
-                <label className="block">
-                  <span className="mb-1.5 block text-xs font-medium text-white/70">Empresa o equipo (opcional)</span>
-                  <input
-                    name="company"
-                    value={form.company}
-                    onChange={handleChange}
-                    className="h-11 w-full rounded-xl border border-white/12 bg-white/[0.04] px-3 text-sm text-white outline-none transition-colors placeholder:text-white/30 focus:border-brand-accent/60"
-                    placeholder="Nombre de la organización"
-                  />
-                </label>
-
-                <label className="block">
-                  <span className="mb-1.5 block text-xs font-medium text-white/70">Mensaje</span>
-                  <textarea
-                    name="message"
-                    value={form.message}
-                    onChange={handleChange}
-                    required
-                    rows={5}
-                    className="w-full resize-y rounded-xl border border-white/12 bg-white/[0.04] px-3 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-white/30 focus:border-brand-accent/60"
-                    placeholder="Cuéntanos brevemente objetivo, contexto y urgencia."
-                  />
-                </label>
-
-                <input
-                  type="text"
-                  name="website"
-                  value={form.website}
-                  onChange={handleChange}
-                  tabIndex={-1}
-                  autoComplete="off"
-                  className="hidden"
-                  aria-hidden="true"
-                />
 
                 <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-xs text-white/40">

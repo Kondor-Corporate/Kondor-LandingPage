@@ -1,9 +1,6 @@
 import "./index.css";
 import { Composition } from "remotion";
-import { KondorVideo } from "./Composition";
-
-// Total: 90+300+240+240+300+240+240+150 = 1800 frames, minus 7×20 transitions = 1660
-const TOTAL_FRAMES = 1660;
+import { KondorVideo, TOTAL_FRAMES } from "./Composition";
 
 export const RemotionRoot: React.FC = () => {
   return (

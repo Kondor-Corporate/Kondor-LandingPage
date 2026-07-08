@@ -1,5 +1,7 @@
 import { TransitionSeries, linearTiming } from "@remotion/transitions";
 import { fade } from "@remotion/transitions/fade";
+import { slide } from "@remotion/transitions/slide";
+import { wipe } from "@remotion/transitions/wipe";
 import { IntroScene } from "./scenes/IntroScene";
 import { HeroScene } from "./scenes/HeroScene";
 import { AboutScene } from "./scenes/AboutScene";
@@ -9,22 +11,31 @@ import { TeamScene } from "./scenes/TeamScene";
 import { CTAScene } from "./scenes/CTAScene";
 import { OutroScene } from "./scenes/OutroScene";
 
-// Scene durations (frames @ 30fps)
-const INTRO = 90;       // 3s
-const HERO = 300;       // 10s
-const ABOUT = 240;      // 8s
-const VISION = 240;     // 8s
-const PORTFOLIO = 300;  // 10s
-const TEAM = 240;       // 8s
-const CTA = 240;        // 8s
-const OUTRO = 150;      // 5s
+// Scene durations (frames @ 30fps) — max 5s = 150 frames per scene
+const INTRO     = 120; // 4s
+const HERO      = 150; // 5s
+const ABOUT     = 120; // 4s
+const VISION    = 120; // 4s
+const PORTFOLIO = 150; // 5s
+const TEAM      = 120; // 4s
+const CTA       = 120; // 4s
+const OUTRO     = 120; // 4s
 
-// Transition duration
-const T = 20; // frames
+// Transition duration (frames)
+const T = 20;
 
-// Total: 90+300+240+240+300+240+240+150 - 7×20 = 1800 - 140 = 1660
+// Total: 120+150+120+120+150+120+120+120 - 7×20 = 1020 - 140 = 1020
+// Actual TransitionSeries total: sum of sequence durations minus overlapping transitions
+// = 1020 frames (sequences) - 140 (7 transitions each consuming T frames of overlap)
+// = 1020 - 140 = 880 ... but TransitionSeries sums sequences minus transitions
+// Correct: TOTAL = INTRO+HERO+ABOUT+VISION+PORTFOLIO+TEAM+CTA+OUTRO - 7*T
+export const TOTAL_FRAMES =
+  INTRO + HERO + ABOUT + VISION + PORTFOLIO + TEAM + CTA + OUTRO - 7 * T;
+// = 120+150+120+120+150+120+120+120 - 140 = 1020 - 140 = 880
 
-const FADE = fade();
+const FADE   = fade();
+const SLIDE  = slide({ direction: "from-right" });
+const WIPE   = wipe({ direction: "from-right" });
 const TIMING = linearTiming({ durationInFrames: T });
 
 export const KondorVideo: React.FC = () => {
@@ -34,13 +45,13 @@ export const KondorVideo: React.FC = () => {
         <IntroScene />
       </TransitionSeries.Sequence>
 
-      <TransitionSeries.Transition presentation={FADE} timing={TIMING} />
+      <TransitionSeries.Transition presentation={SLIDE} timing={TIMING} />
 
       <TransitionSeries.Sequence durationInFrames={HERO} premountFor={T}>
         <HeroScene />
       </TransitionSeries.Sequence>
 
-      <TransitionSeries.Transition presentation={FADE} timing={TIMING} />
+      <TransitionSeries.Transition presentation={WIPE} timing={TIMING} />
 
       <TransitionSeries.Sequence durationInFrames={ABOUT} premountFor={T}>
         <AboutScene />
@@ -52,13 +63,13 @@ export const KondorVideo: React.FC = () => {
         <VisionScene />
       </TransitionSeries.Sequence>
 
-      <TransitionSeries.Transition presentation={FADE} timing={TIMING} />
+      <TransitionSeries.Transition presentation={SLIDE} timing={TIMING} />
 
       <TransitionSeries.Sequence durationInFrames={PORTFOLIO} premountFor={T}>
         <PortfolioScene />
       </TransitionSeries.Sequence>
 
-      <TransitionSeries.Transition presentation={FADE} timing={TIMING} />
+      <TransitionSeries.Transition presentation={WIPE} timing={TIMING} />
 
       <TransitionSeries.Sequence durationInFrames={TEAM} premountFor={T}>
         <TeamScene />
@@ -70,7 +81,7 @@ export const KondorVideo: React.FC = () => {
         <CTAScene />
       </TransitionSeries.Sequence>
 
-      <TransitionSeries.Transition presentation={FADE} timing={TIMING} />
+      <TransitionSeries.Transition presentation={SLIDE} timing={TIMING} />
 
       <TransitionSeries.Sequence durationInFrames={OUTRO} premountFor={T}>
         <OutroScene />

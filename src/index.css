@@ -16,7 +16,8 @@
       rgba(180, 45, 22, 0.55) 28%,
       rgba(30, 30, 36, 1) 58%
     );
-    background-attachment: fixed;
+    /* scroll en lugar de fixed: menos repaints al moverse por la página */
+    background-attachment: scroll;
   }
 
   * {
@@ -29,33 +30,133 @@
     text-wrap: balance;
   }
 
+  /* Animaciones ligeras (GPU: transform) — preferibles a bucles pesados en JS */
+  .animate-radar-spin {
+    animation: kondor-radar-spin 4s linear infinite;
+    will-change: transform;
+  }
+
+  .animate-btn-shimmer {
+    animation: kondor-btn-shimmer 4.5s ease-in-out infinite;
+    animation-delay: 0.8s;
+    will-change: transform;
+  }
+
+  .animate-connector-flow {
+    animation: kondor-connector-dash 2.4s linear infinite;
+    will-change: stroke-dashoffset;
+  }
+
+  .animate-connector-flow-delayed {
+    animation: kondor-connector-dash 2.35s linear infinite;
+    will-change: stroke-dashoffset;
+  }
+
   /**
-   * Difumina los 4 bordes de la píldora nav con estilo Apple:
-   * - Dos gradientes lineales en intersección: uno H, uno V
-   * - El vidrio se desvanece sin cortar el texto (que vive en la zona central opaca)
+   * Vidrio del índice: fade vertical + horizontal (intersección).
+   * Ocupa todo el hueco entre logo y CTA; los costados se funden (sin “pila”).
    */
-  .mask-nav-pill-feather {
-    /* Gradiente horizontal: fade izq/der */
-    --mh: linear-gradient(to right,
+  .mask-nav-glass-hv {
+    --nav-mh: linear-gradient(
+      to right,
       transparent 0%,
-      black 14%,
-      black 86%,
-      transparent 100%
-    );
-    /* Gradiente vertical: fade top/bottom (más % porque el pill es corto en altura) */
-    --mv: linear-gradient(to bottom,
-      transparent 0%,
+      rgba(0, 0, 0, 0.05) 4%,
+      rgba(0, 0, 0, 0.14) 10%,
+      rgba(0, 0, 0, 0.35) 18%,
+      rgba(0, 0, 0, 0.62) 24%,
+      rgba(0, 0, 0, 0.88) 27%,
       black 30%,
       black 70%,
+      rgba(0, 0, 0, 0.88) 73%,
+      rgba(0, 0, 0, 0.62) 76%,
+      rgba(0, 0, 0, 0.35) 82%,
+      rgba(0, 0, 0, 0.14) 90%,
+      rgba(0, 0, 0, 0.05) 96%,
       transparent 100%
     );
-
-    mask-image: var(--mh), var(--mv);
+    --nav-mv: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(0, 0, 0, 0.04) 4%,
+      rgba(0, 0, 0, 0.1) 9%,
+      rgba(0, 0, 0, 0.22) 14%,
+      rgba(0, 0, 0, 0.38) 18%,
+      rgba(0, 0, 0, 0.55) 22%,
+      rgba(0, 0, 0, 0.72) 25%,
+      rgba(0, 0, 0, 0.88) 28%,
+      black 30%,
+      black 70%,
+      rgba(0, 0, 0, 0.88) 72%,
+      rgba(0, 0, 0, 0.72) 75%,
+      rgba(0, 0, 0, 0.55) 78%,
+      rgba(0, 0, 0, 0.38) 82%,
+      rgba(0, 0, 0, 0.22) 86%,
+      rgba(0, 0, 0, 0.1) 91%,
+      rgba(0, 0, 0, 0.04) 96%,
+      transparent 100%
+    );
+    mask-image: var(--nav-mh), var(--nav-mv);
     mask-composite: intersect;
     mask-repeat: no-repeat;
-
-    -webkit-mask-image: var(--mh), var(--mv);
+    mask-size: 100% 100%;
+    -webkit-mask-image: var(--nav-mh), var(--nav-mv);
     -webkit-mask-composite: source-in;
     -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+  }
+
+  /* Brillo superior: solo gradiente vertical; 0% transparente → sin línea dura arriba */
+  .nav-glass-sheen-top {
+    background-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 24%,
+      rgba(255, 255, 255, 0.045) 52%,
+      rgba(255, 255, 255, 0.016) 80%,
+      transparent 100%
+    );
+  }
+
+  .nav-glass-sheen-bottom {
+    background-image: linear-gradient(
+      to top,
+      transparent 0%,
+      transparent 22%,
+      rgba(0, 0, 0, 0.065) 50%,
+      rgba(0, 0, 0, 0.095) 100%
+    );
+  }
+}
+
+@keyframes kondor-radar-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes kondor-btn-shimmer {
+  0% {
+    transform: translateX(-100%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(220%) skewX(-12deg);
+  }
+}
+
+@keyframes kondor-connector-dash {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-radar-spin {
+    animation-duration: 12s;
+  }
+
+  .animate-btn-shimmer,
+  .animate-connector-flow,
+  .animate-connector-flow-delayed {
+    animation: none !important;
   }
 }

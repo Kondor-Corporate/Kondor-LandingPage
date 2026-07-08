@@ -86,7 +86,7 @@ export default function CTASection({ onOpenContactForm }) {
             whileTap={{ scale: 0.97 }}
             className="flex items-center gap-2.5 bg-brand-accent text-white font-bold text-base px-9 py-4 rounded-2xl shadow-xl shadow-brand-accent/35 hover:brightness-110 transition-all duration-200"
           >
-            Solicitar una conversación
+            Solicitar conversación
             <ArrowRight size={17} />
           </motion.a>
 

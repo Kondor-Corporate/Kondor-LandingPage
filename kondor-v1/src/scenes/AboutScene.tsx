@@ -12,23 +12,24 @@ const { fontFamily } = loadFont("normal", {
   subsets: ["latin"],
 });
 
+// Copy alineado con la landing actual (AboutSection.jsx)
 const CARDS = [
   {
     icon: "◎",
     title: "Quiénes somos",
-    body: "Una arquitectura de pensamiento digital diseñada para la anticipación absoluta.",
+    body: "Una software factory que diseña y construye sistemas digitales para la evolución tecnológica de empresas en crecimiento.",
     accent: false,
   },
   {
     icon: "⚡",
-    title: "Qué hacemos",
-    body: "Decodificamos la complejidad para devolver simplicidad operativa y autonomía total.",
+    title: "Cómo trabajamos",
+    body: "Visión de producto, criterio técnico y buenas prácticas de ingeniería para construir soluciones claras, seguras y escalables.",
     accent: true,
   },
   {
     icon: "◎",
-    title: "Qué obtienes",
-    body: "Sistemas que aprenden y procesos que se superan a sí mismos por diseño.",
+    title: "Qué buscamos",
+    body: "Ayudamos a organizaciones pequeñas y medianas a operar con más estructura, visibilidad y capacidad de crecimiento.",
     accent: false,
   },
 ];
@@ -37,47 +38,44 @@ export const AboutScene: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
-  const fadeIn = interpolate(frame, [0, fps * 0.3], [0, 1], {
+  // Duración: 120 frames (4s)
+  const fadeIn = interpolate(frame, [0, fps * 0.25], [0, 1], {
     extrapolateRight: "clamp",
   });
   const fadeOut = interpolate(
     frame,
-    [durationInFrames - fps * 0.5, durationInFrames],
+    [durationInFrames - fps * 0.4, durationInFrames],
     [1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
-  // Section header
-  const headerY = interpolate(frame, [fps * 0.2, fps * 0.8], [40, 0], {
+  const headerY = interpolate(frame, [fps * 0.15, fps * 0.65], [36, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const headerOpacity = interpolate(frame, [fps * 0.2, fps * 0.8], [0, 1], {
+  const headerOpacity = interpolate(frame, [fps * 0.15, fps * 0.65], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Cards spring entrance
   const cardAnimations = CARDS.map((_, i) => {
-    const delay = fps * (0.7 + i * 0.22);
-    const cardSpring = spring({
+    const delay = fps * (0.55 + i * 0.18);
+    const s = spring({
       frame: frame - delay,
       fps,
-      config: { damping: 200 },
-      durationInFrames: fps * 0.8,
+      config: { damping: 220, stiffness: 90 },
+      durationInFrames: fps * 0.7,
     });
-    const y = interpolate(cardSpring, [0, 1], [60, 0]);
-    const opacity = interpolate(cardSpring, [0, 1], [0, 1]);
-    return { y, opacity };
+    return {
+      y: interpolate(s, [0, 1], [50, 0]),
+      opacity: interpolate(s, [0, 1], [0, 1]),
+    };
   });
 
-  // Accent line width animation for featured card
-  const accentLineWidth = interpolate(
-    frame,
-    [fps * 1.2, fps * 1.8],
-    [0, 100],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
-  );
+  const accentLineWidth = interpolate(frame, [fps * 0.9, fps * 1.5], [0, 100], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
 
   return (
     <AbsoluteFill
@@ -94,7 +92,7 @@ export const AboutScene: React.FC = () => {
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(ellipse at 72% 65%, rgba(237,73,47,0.92) 0%, rgba(180,45,22,0.55) 28%, rgba(30,30,36,1) 58%)",
+            "radial-gradient(ellipse at 72% 65%, rgba(237,73,47,0.85) 0%, rgba(180,45,22,0.5) 28%, rgba(30,30,36,1) 58%)",
         }}
       />
 
@@ -126,7 +124,7 @@ export const AboutScene: React.FC = () => {
           style={{
             opacity: headerOpacity,
             transform: `translateY(${headerY}px)`,
-            marginBottom: 60,
+            marginBottom: 52,
           }}
         >
           <div
@@ -134,16 +132,10 @@ export const AboutScene: React.FC = () => {
               display: "flex",
               alignItems: "center",
               gap: 10,
-              marginBottom: 20,
+              marginBottom: 16,
             }}
           >
-            <div
-              style={{
-                width: 32,
-                height: 1,
-                background: "rgba(237,73,47,0.7)",
-              }}
-            />
+            <div style={{ width: 28, height: 1, background: "rgba(237,73,47,0.7)" }} />
             <span
               style={{
                 fontSize: 11,
@@ -159,25 +151,25 @@ export const AboutScene: React.FC = () => {
           <h2
             style={{
               margin: 0,
-              fontSize: 52,
+              fontSize: 50,
               fontWeight: 900,
               color: "white",
               lineHeight: 1.15,
               letterSpacing: "-0.02em",
             }}
           >
-            Más que una empresa de software,
+            Construimos con criterio,
             <br />
-            <span style={{ color: "#ED492F" }}>un ecosistema de criterio.</span>
+            <span style={{ color: "#ED492F" }}>no por improvisación.</span>
           </h2>
         </div>
 
-        {/* Cards grid */}
+        {/* Cards */}
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr 1fr",
-            gap: 24,
+            gap: 20,
           }}
         >
           {CARDS.map(({ title, body, accent }, i) => {
@@ -196,11 +188,11 @@ export const AboutScene: React.FC = () => {
                   background: accent
                     ? "rgba(237,73,47,0.08)"
                     : "rgba(255,255,255,0.05)",
-                  padding: "36px 32px",
+                  padding: "30px 28px",
                   overflow: "hidden",
                 }}
               >
-                {/* Top accent line */}
+                {/* Accent top line (animated) */}
                 <div
                   style={{
                     position: "absolute",
@@ -213,14 +205,14 @@ export const AboutScene: React.FC = () => {
                   }}
                 />
 
-                {/* Icon placeholder */}
+                {/* Icon */}
                 <div
                   style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 14,
+                    width: 44,
+                    height: 44,
+                    borderRadius: 13,
                     background: accent
-                      ? "rgba(237,73,47,0.2)"
+                      ? "rgba(237,73,47,0.18)"
                       : "rgba(255,255,255,0.07)",
                     border: accent
                       ? "1px solid rgba(237,73,47,0.3)"
@@ -228,18 +220,18 @@ export const AboutScene: React.FC = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    marginBottom: 24,
-                    fontSize: 20,
-                    color: accent ? "#ED492F" : "rgba(255,255,255,0.75)",
+                    marginBottom: 20,
+                    fontSize: 18,
+                    color: accent ? "#ED492F" : "rgba(255,255,255,0.7)",
                   }}
                 >
-                  {i === 0 ? "◎" : i === 1 ? "⚡" : "◎"}
+                  {i === 1 ? "⚡" : i === 0 ? "◎" : "⊙"}
                 </div>
 
                 <h3
                   style={{
-                    margin: "0 0 12px",
-                    fontSize: 18,
+                    margin: "0 0 10px",
+                    fontSize: 16,
                     fontWeight: 700,
                     color: "white",
                   }}
@@ -249,7 +241,7 @@ export const AboutScene: React.FC = () => {
                 <p
                   style={{
                     margin: 0,
-                    fontSize: 15,
+                    fontSize: 13,
                     color: "rgba(255,255,255,0.55)",
                     lineHeight: 1.65,
                   }}
