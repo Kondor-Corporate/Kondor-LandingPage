@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 import Navbar from './components/Navbar'
 import HeroSection from './components/HeroSection'
 import AboutSection from './components/AboutSection'
@@ -8,11 +9,13 @@ import CTASection from './components/CTASection'
 import TeamSection from './components/TeamSection'
 import Footer from './components/Footer'
 import ContactFormModal from './components/ContactFormModal'
+import LegalModal from './components/LegalModal'
 import { initAnalytics, initializeAttribution, trackLeadFormView, trackPageView } from './lib/analytics'
 
 export default function App() {
   const [isContactFormOpen, setIsContactFormOpen] = useState(false)
   const [contactFormOrigin, setContactFormOrigin] = useState(null)
+  const [legalType, setLegalType] = useState(null)
 
   useEffect(() => {
     initializeAttribution()
@@ -33,46 +36,30 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen" style={{ overflowX: 'clip' }}>
-      <Navbar onOpenContactForm={openContactForm} />
-      <main>
-        <HeroSection />
-        <AboutSection />
-        <VisionSection />
-        <PortfolioSection />
-        <TeamSection />
-        <CTASection onOpenContactForm={openContactForm} />
-      </main>
-      <Footer onOpenContactForm={openContactForm} />
-      <ContactFormModal
-        open={isContactFormOpen}
-        ctaOrigin={contactFormOrigin}
-        onClose={() => setIsContactFormOpen(false)}
-      />
-import LegalModal from './components/LegalModal'
-
-export default function App() {
-  const [isContactFormOpen, setIsContactFormOpen] = useState(false)
-  const [legalType, setLegalType] = useState(null)
-
-  return (
     <div className="min-h-screen overflow-x-hidden">
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: 'easeOut' }}
       >
-        <Navbar onOpenContactForm={() => setIsContactFormOpen(true)} />
+        <Navbar onOpenContactForm={openContactForm} />
         <main>
           <HeroSection />
           <AboutSection />
           <VisionSection />
           <PortfolioSection />
           <TeamSection />
-          <CTASection onOpenContactForm={() => setIsContactFormOpen(true)} />
+          <CTASection onOpenContactForm={openContactForm} />
         </main>
-        <Footer onOpenLegal={(type) => setLegalType(type)} />
-        <ContactFormModal open={isContactFormOpen} onClose={() => setIsContactFormOpen(false)} />
+        <Footer
+          onOpenContactForm={openContactForm}
+          onOpenLegal={(type) => setLegalType(type)}
+        />
+        <ContactFormModal
+          open={isContactFormOpen}
+          ctaOrigin={contactFormOrigin}
+          onClose={() => setIsContactFormOpen(false)}
+        />
         <LegalModal type={legalType} onClose={() => setLegalType(null)} />
       </motion.div>
     </div>

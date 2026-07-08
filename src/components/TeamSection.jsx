@@ -1,17 +1,3 @@
-import { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Linkedin, Github, Twitter, Instagram, Mail, Globe, X } from 'lucide-react'
-import { trackOutboundClick } from '../lib/analytics'
-
-const SOCIAL_ICON = {
-  linkedin: Linkedin,
-  github: Github,
-  twitter: Twitter,
-  x: Twitter,
-  instagram: Instagram,
-  mail: Mail,
-  web: Globe,
-}
 import { motion } from 'framer-motion'
 import { Linkedin } from 'lucide-react'
 
@@ -125,74 +111,7 @@ export default function TeamSection() {
               <br />
               <span className="text-brand-accent">de Kondor.</span>
             </h2>
-            <p className="text-sm text-white/50 leading-relaxed max-w-sm mt-3">
-              Cuatro cofundadores construyendo Kondor desde producto, ingeniería y visión operativa.
-            </p>
           </div>
-
-          <div className="flex items-center gap-3 text-[10px] font-mono text-white/25 tracking-widest uppercase shrink-0">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand-accent animate-pulse" />
-            4 tripulantes · equipo activo
-          </div>
-        </motion.div>
-
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5"
-        >
-          {TEAM.map(({ id, name, role, img }) => (
-            <motion.div
-              key={id}
-              variants={cardVariants}
-              whileHover={{ y: -6 }}
-              transition={{ type: 'spring', stiffness: 280, damping: 22 }}
-              className="group relative rounded-2xl overflow-hidden border border-white/[0.09] hover:border-brand-accent/40 transition-colors duration-300"
-            >
-              <div className="absolute top-0 left-0 right-0 h-[2px] z-10 bg-gradient-to-r from-transparent via-brand-accent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-              <div className="absolute top-3 left-3 z-10 text-[9px] font-mono text-white/35 tracking-widest bg-black/40 backdrop-blur-sm rounded px-1.5 py-0.5 pointer-events-none">
-                {id}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setOpenId(id)}
-                className="relative block w-full text-left aspect-[3/4] overflow-hidden bg-white/[0.04] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#1E1E24]"
-                aria-label={`Ver perfil de ${name}`}
-              >
-                <img
-                  src={img}
-                  alt=""
-                  className="w-full h-full object-cover object-top grayscale-[30%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500 ease-out"
-                />
-              </button>
-
-              <div
-                className="absolute bottom-0 inset-x-0 px-4 pt-12 pb-5 pointer-events-none"
-                style={{
-                  background:
-                    'linear-gradient(to top, rgba(20,20,28,0.96) 55%, transparent 100%)',
-                }}
-              >
-                <div className="w-6 h-px bg-brand-accent/60 mb-3 group-hover:w-10 transition-all duration-300" />
-
-                <p className="text-sm font-bold text-white tracking-tight leading-none mb-1">
-                  {name}
-                </p>
-                <p className="text-[10px] font-semibold text-brand-accent/80 tracking-[0.18em] uppercase">
-                  {role}
-                </p>
-              </div>
-
-              <div
-                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                style={{ boxShadow: 'inset 0 0 40px rgba(237,73,47,0.07)' }}
-              />
-            </motion.div>
-          ))}
         </motion.div>
 
         <div className="relative">
@@ -209,73 +128,6 @@ export default function TeamSection() {
             viewport={{ once: true, margin: '-60px' }}
             className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4"
           >
-            <button
-              type="button"
-              aria-label="Cerrar"
-              className="absolute inset-0 bg-black/65 backdrop-blur-sm"
-              onClick={close}
-            />
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.94, y: 12 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 8 }}
-              transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-              className="relative w-full max-w-[22rem] rounded-2xl border border-white/12 bg-[#1E1E24]/95 backdrop-blur-xl shadow-[0_24px_80px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.06)] overflow-hidden"
-            >
-              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand-accent/60 to-transparent" />
-
-              <button
-                type="button"
-                onClick={close}
-                className="absolute top-3 right-3 z-10 p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors"
-                aria-label="Cerrar"
-              >
-                <X size={18} />
-              </button>
-
-              <div className="p-5 pt-6">
-                <div className="flex gap-4 mb-4">
-                  <div className="shrink-0 w-16 h-16 rounded-xl overflow-hidden border border-white/10 ring-1 ring-brand-accent/20">
-                    <img src={member.img} alt="" className="w-full h-full object-cover object-top" />
-                  </div>
-                  <div className="min-w-0 pt-0.5">
-                    <p id="team-modal-title" className="text-lg font-black text-white tracking-tight">
-                      {member.name}
-                    </p>
-                    <p className="text-[10px] font-semibold text-brand-accent/85 tracking-[0.18em] uppercase mt-1">
-                      {member.role}
-                    </p>
-                    <p className="text-[9px] font-mono text-white/30 tracking-widest mt-2">
-                      {member.id} · perfil
-                    </p>
-                  </div>
-                </div>
-
-                <p className="text-sm text-white/65 leading-relaxed border-l-2 border-brand-accent/35 pl-3 mb-5">
-                  {member.bio}
-                </p>
-
-                <p className="text-[9px] font-mono text-white/35 tracking-[0.2em] uppercase mb-2.5">
-                  Redes
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {member.socials.map(({ kind, label, href }) => {
-                    const Icon = SOCIAL_ICON[kind] ?? Globe
-                    const isMail = href.startsWith('mailto:')
-                    return (
-                      <a
-                        key={`${member.id}-${label}`}
-                        href={href}
-                        {...(isMail ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
-                        onClick={() => {
-                          trackOutboundClick({
-                            outbound_url: href,
-                            link_text: `${member.name} ${label}`,
-                            location: 'team_modal',
-                          })
-                        }}
-                        className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-white/85 bg-white/[0.06] border border-white/10 hover:border-brand-accent/45 hover:bg-brand-accent/[0.08] transition-colors"
             {TEAM.map(({ id, name, role, img, bio, socials, photoClassName }, index) => {
               const num = String(index + 1).padStart(2, '0')
               const primarySocial = socials[0]

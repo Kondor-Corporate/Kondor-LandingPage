@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, ArrowRight } from 'lucide-react'
-import { trackContactClick, trackCtaClick } from '../lib/analytics'
 
 const navLinks = [
   { label: 'Nosotros', href: '#nosotros' },
@@ -66,18 +65,6 @@ export default function Navbar({ onOpenContactForm }) {
             <li key={link.href} className="group relative z-[1] flex">
               <a
                 href={link.href}
-                onClick={() => {
-                  if (link.href === '#contacto') {
-                    trackContactClick({
-                      contact_type: 'section_anchor',
-                      link_text: link.label,
-                      location: 'navbar_desktop',
-                    })
-                  }
-                }}
-                className="flex items-center justify-center text-sm font-medium text-white/80 hover:text-white
-                  px-5 py-2.5 min-h-[2.75rem] transition-[background-color,color] duration-200
-                  hover:bg-white/[0.11] active:bg-white/[0.06]"
                 className="relative flex items-center justify-center text-sm font-medium
                   text-white/[0.78] hover:text-white
                   px-4 py-2.5 min-h-[2.65rem]
@@ -108,18 +95,7 @@ export default function Navbar({ onOpenContactForm }) {
             onClick={(event) => {
               if (!onOpenContactForm) return
               event.preventDefault()
-              trackCtaClick({
-                cta_id: 'navbar_desktop_contact',
-                cta_label: 'Hablar con el equipo',
-                cta_destination: 'contact_modal',
-                location: 'navbar_desktop',
-              })
-              trackContactClick({
-                contact_type: 'form_open',
-                link_text: 'Hablar con el equipo',
-                location: 'navbar_desktop',
-              })
-              onOpenContactForm('navbar_desktop_contact')
+              onOpenContactForm()
             }}
             whileHover={{ scale: 1.04, boxShadow: '0 0 44px rgba(237,73,47,0.55)' }}
             whileTap={{ scale: 0.97 }}
@@ -161,16 +137,7 @@ export default function Navbar({ onOpenContactForm }) {
                 <a
                   key={link.href}
                   href={link.href}
-                  onClick={() => {
-                    setMenuOpen(false)
-                    if (link.href === '#contacto') {
-                      trackContactClick({
-                        contact_type: 'section_anchor',
-                        link_text: link.label,
-                        location: 'navbar_mobile',
-                      })
-                    }
-                  }}
+                  onClick={() => setMenuOpen(false)}
                   className="text-sm font-medium text-white/80 hover:text-white py-2.5 transition-colors"
                 >
                   {link.label}
@@ -182,18 +149,7 @@ export default function Navbar({ onOpenContactForm }) {
                   setMenuOpen(false)
                   if (!onOpenContactForm) return
                   event.preventDefault()
-                  trackCtaClick({
-                    cta_id: 'navbar_mobile_contact',
-                    cta_label: 'Hablar con el equipo',
-                    cta_destination: 'contact_modal',
-                    location: 'navbar_mobile',
-                  })
-                  trackContactClick({
-                    contact_type: 'form_open',
-                    link_text: 'Hablar con el equipo',
-                    location: 'navbar_mobile',
-                  })
-                  onOpenContactForm('navbar_mobile_contact')
+                  onOpenContactForm()
                 }}
                 whileTap={{ scale: 0.98 }}
                 className="relative flex items-center justify-center gap-2 overflow-hidden mt-2 text-sm font-bold px-5 py-3 rounded-2xl text-white"
