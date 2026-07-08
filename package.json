@@ -8,6 +8,7 @@
     "build": "vite build",
     "postinstall": "prisma generate",
     "preview": "vite preview",
+    "convert-images": "node scripts/convert-images.mjs",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
@@ -20,10 +21,6 @@
   },
   "dependencies": {
     "@prisma/client": "^6.10.1",
-    "preview": "vite preview",
-    "convert-images": "node scripts/convert-images.mjs"
-  },
-  "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.17.10",

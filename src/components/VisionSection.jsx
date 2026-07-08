@@ -1,21 +1,4 @@
 import { motion } from 'framer-motion'
-import { Plug, Cpu, Layers, Crosshair } from 'lucide-react'
-
-const pillars = [
-  {
-    icon: Plug,
-    title: 'Productos conectados',
-    n: '01',
-  },
-  {
-    icon: Cpu,
-    title: 'Pensamiento de sistema',
-    n: '02',
-  },
-  {
-    icon: Layers,
-    title: 'Arquitectura escalable',
-    n: '03',
 import { Layers, Cpu, TrendingUp, Network, Crosshair } from 'lucide-react'
 
 const pillars = [
@@ -143,13 +126,6 @@ export default function VisionSection() {
                 </div>
               </motion.div>
 
-              <div className="flex shrink-0 flex-col gap-6 lg:max-w-md lg:text-right">
-                <p className="text-base lg:text-lg text-white/55 leading-relaxed border-l border-white/15 pl-5 lg:border-l-0 lg:border-r lg:pl-0 lg:pr-5">
-                  Diseñamos sistemas para que empresas en crecimiento puedan operar con la claridad,
-                  estructura y disciplina tecnológica que antes parecía reservada para organizaciones
-                  mucho más grandes.
-                </p>
-              </div>
               <motion.p
                 variants={fadeUpShort}
                 className="max-w-md shrink-0 text-base leading-relaxed text-white/[0.52] lg:max-w-sm lg:text-right lg:text-[1.05rem] lg:leading-relaxed"
