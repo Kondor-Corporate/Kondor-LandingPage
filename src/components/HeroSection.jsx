@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { ArrowRight, ChevronDown } from 'lucide-react'
+import { trackContactClick, trackCtaClick } from '../lib/analytics'
 
 /* ── Radar constants ──────────────────────────────────────────── */
 
@@ -85,7 +86,7 @@ export default function HeroSection() {
               transition={{ delay: 0.38, duration: 0.60 }}
               className="text-lg text-white/60 font-light leading-relaxed max-w-lg border-l-2 border-white/20 pl-5"
             >
-              Impulsa el despegue de tu empresa - ¿Listo para volar?
+              Diseñamos sistemas para que las empresas operen con más estructura, control y escala.
             </motion.p>
 
             <motion.div
@@ -96,6 +97,19 @@ export default function HeroSection() {
             >
               <motion.a
                 href="#contacto"
+                onClick={() => {
+                  trackCtaClick({
+                    cta_id: 'hero_contact_anchor',
+                    cta_label: 'Hablar con el equipo',
+                    cta_destination: '#contacto',
+                    location: 'hero',
+                  })
+                  trackContactClick({
+                    contact_type: 'section_anchor',
+                    link_text: 'Hablar con el equipo',
+                    location: 'hero',
+                  })
+                }}
                 whileHover={{ scale: 1.04, boxShadow: '0 0 44px rgba(237,73,47,0.55)' }}
                 whileTap={{ scale: 0.97 }}
                 className="relative flex items-center gap-3 overflow-hidden rounded-2xl px-8 py-4 text-sm font-bold text-white"
@@ -109,12 +123,20 @@ export default function HeroSection() {
                   animate={{ x: ['-100%', '220%'] }}
                   transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 2.0, ease: 'easeInOut' }}
                 />
-                <span>Transformar mi organización</span>
+                <span>Hablar con el equipo</span>
                 <ArrowRight size={16} className="shrink-0" />
               </motion.a>
 
               <motion.a
                 href="#vision"
+                onClick={() => {
+                  trackCtaClick({
+                    cta_id: 'hero_vision_anchor',
+                    cta_label: 'Conocer mas',
+                    cta_destination: '#vision',
+                    location: 'hero',
+                  })
+                }}
                 whileHover={{ x: 3 }}
                 className="flex items-center gap-2 text-sm text-white/55 hover:text-white transition-colors"
               >
@@ -130,9 +152,9 @@ export default function HeroSection() {
               className="flex items-center gap-8 pt-4 border-t border-white/10"
             >
               {[
-                { value: '3+',   label: 'Productos en producción' },
+                { value: '3+',   label: 'Productos activos' },
                 { value: '100%', label: 'Ingeniería propia' },
-                { value: '4',    label: 'Especialistas' },
+                { value: '4',    label: 'Cofundadores' },
               ].map(({ value, label }) => (
                 <div key={label} className="flex flex-col gap-0.5">
                   <span className="text-xl font-black text-white">{value}</span>

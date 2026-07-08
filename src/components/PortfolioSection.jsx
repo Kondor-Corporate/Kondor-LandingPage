@@ -9,6 +9,11 @@ const products = [
     tagline: 'Gestión operativa de base',
     description:
       'Plataforma central de gestión operativa para organizaciones en crecimiento. Estructura, visibilidad y control en un único sistema.',
+    bullets: [
+      'Estructura tu operación desde el primer día',
+      'Visibilidad total en un solo sistema',
+      'Adaptable a tu flujo, no al revés',
+    ],
     status: 'En producción',
     statusColor: 'text-emerald-200/95 bg-emerald-500/15 border-emerald-400/20',
     highlight: false,
@@ -19,6 +24,11 @@ const products = [
     tagline: 'Automatización de procesos',
     description:
       'Sistema de automatización de flujos operativos diseñado para organizaciones con procesos complejos de gestión y seguimiento.',
+    bullets: [
+      'Automatizá flujos sin depender de IT',
+      'Trazabilidad sin overhead burocrático',
+      'Escalá sin rediseñar todo',
+    ],
     status: 'En producción',
     statusColor: 'text-emerald-200/95 bg-emerald-500/15 border-emerald-400/20',
     highlight: true,
@@ -29,6 +39,11 @@ const products = [
     tagline: 'Trazabilidad y auditoría',
     description:
       'Módulo de trazabilidad y auditoría para equipos distribuidos. Registro completo de operaciones con criterio de ingeniería.',
+    bullets: [
+      'Auditoría completa con criterio de ingeniería',
+      'Integración con sistemas existentes',
+      'Reportes para equipos y directivos',
+    ],
     status: 'En desarrollo',
     statusColor: 'text-sky-200/95 bg-sky-500/15 border-sky-400/20',
     highlight: false,
@@ -187,6 +202,9 @@ function RoadmapNode({ product, isActive, onSelect }) {
       >
         {product.status}
       </span>
+      <span className="mt-2 text-[9px] text-brand-accent/80 font-semibold tracking-wide underline underline-offset-2">
+        Conocer producto →
+      </span>
     </button>
   )
 }
@@ -219,12 +237,12 @@ export default function PortfolioSection() {
           </span>
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
             <h2 className="text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight text-balance">
-              Hoja de ruta
+              Nuestro portfolio
               <br />
-              <span className="text-brand-accent">de nuestros sistemas.</span>
+              <span className="text-brand-accent">de productos.</span>
             </h2>
             <p className="text-white/55 text-sm leading-relaxed max-w-md">
-              Recorrido horizontal del ecosistema: elegí un producto para ver el foco y el estado. Menos scroll, misma profundidad.
+              Cada producto resuelve una capa distinta de la operación. Explorá el portfolio y conocé el foco de cada sistema.
             </p>
           </div>
         </motion.div>
@@ -261,10 +279,23 @@ export default function PortfolioSection() {
                 transition={{ duration: 0.25 }}
                 className="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-4 sm:px-6 sm:py-5"
               >
-                <p className="text-[10px] font-mono text-brand-accent/80 tracking-[0.2em] uppercase mb-1.5">
-                  {activeProduct.name}
-                </p>
-                <p className="text-sm text-white/65 leading-relaxed">{activeProduct.description}</p>
+                <div className="flex items-center gap-3 mb-3">
+                  <p className="text-[10px] font-mono text-brand-accent/80 tracking-[0.2em] uppercase">
+                    {activeProduct.name}
+                  </p>
+                  <span className={`text-[8px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md border ${activeProduct.statusColor}`}>
+                    {activeProduct.status}
+                  </span>
+                </div>
+                <p className="text-sm text-white/65 leading-relaxed mb-4">{activeProduct.description}</p>
+                <ul className="flex flex-col gap-1.5">
+                  {activeProduct.bullets.map((b) => (
+                    <li key={b} className="flex items-start gap-2 text-sm text-white/50">
+                      <span className="mt-1.5 w-1 h-1 rounded-full bg-brand-accent/60 shrink-0" />
+                      {b}
+                    </li>
+                  ))}
+                </ul>
               </motion.div>
             )}
           </AnimatePresence>

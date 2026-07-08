@@ -1,20 +1,20 @@
 import { motion } from 'framer-motion'
-import { Layers, Cpu, TrendingUp, Crosshair } from 'lucide-react'
+import { Plug, Cpu, Layers, Crosshair } from 'lucide-react'
 
 const pillars = [
   {
-    icon: Cpu,
-    title: 'Ingeniería de criterio',
+    icon: Plug,
+    title: 'Productos conectados',
     n: '01',
   },
   {
-    icon: Layers,
-    title: 'Marca madre',
+    icon: Cpu,
+    title: 'Pensamiento de sistema',
     n: '02',
   },
   {
-    icon: TrendingUp,
-    title: 'Evolución continua',
+    icon: Layers,
+    title: 'Arquitectura escalable',
     n: '03',
   },
 ]
@@ -99,8 +99,9 @@ export default function VisionSection() {
 
               <div className="flex shrink-0 flex-col gap-6 lg:max-w-md lg:text-right">
                 <p className="text-base lg:text-lg text-white/55 leading-relaxed border-l border-white/15 pl-5 lg:border-l-0 lg:border-r lg:pl-0 lg:pr-5">
-                  Somos cuatro personas con criterio técnico claro. Creamos sistemas para que las
-                  medianas organizaciones puedan operar como grandes corporaciones.
+                  Diseñamos sistemas para que empresas en crecimiento puedan operar con la claridad,
+                  estructura y disciplina tecnológica que antes parecía reservada para organizaciones
+                  mucho más grandes.
                 </p>
               </div>
             </div>
