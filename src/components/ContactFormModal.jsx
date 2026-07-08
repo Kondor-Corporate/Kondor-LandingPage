@@ -3,6 +3,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { AnimatePresence, motion } from 'framer-motion'
+import { X, Send } from 'lucide-react'
+import { trackLeadFormSubmit } from '../lib/analytics'
+import { hasLeadIngestionEndpoint, persistLeadFromContactForm } from '../lib/leadCapture'
 import { CheckCircle2, Send, X } from 'lucide-react'
 
 const DEFAULT_FORMSPREE_ENDPOINT = 'https://formspree.io/f/xvzvdypk'
@@ -49,6 +52,14 @@ function inputClassName(hasError) {
     : `${base} border-white/12 focus:border-brand-accent/60`
 }
 
+export default function ContactFormModal({ open, ctaOrigin, onClose }) {
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    company: '',
+    message: '',
+    website: '',
+  })
 export default function ContactFormModal({ open, onClose }) {
   const [view, setView] = useState('form')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -61,6 +72,27 @@ export default function ContactFormModal({ open, onClose }) {
   const formEndpoint =
     endpointFromEnv || (formIdFromEnv ? `https://formspree.io/f/${formIdFromEnv}` : DEFAULT_FORMSPREE_ENDPOINT)
 
+  const notifyFormspree = async () => {
+    const response = await fetch(formEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        name: form.name,
+        email: form.email,
+        company: form.company,
+        message: form.message,
+        _subject: `Nuevo contacto desde landing - ${form.name}`,
+        _gotcha: form.website,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error('formspree_notification_failed')
+    }
+  }
   const {
     register,
     handleSubmit,
@@ -99,6 +131,14 @@ export default function ContactFormModal({ open, onClose }) {
     reset(defaultFormValues)
   }, [open, reset])
 
+    // Honeypot anti-spam: bots often complete hidden fields.
+    if (form.website.trim()) {
+      trackLeadFormSubmit({
+        form_id: 'contact_modal',
+        submit_status: 'spam_filtered',
+      })
+      setSubmitStatus('success')
+      setSubmitMessage('Mensaje enviado. Te responderemos pronto.')
   const onValidSubmit = async (data) => {
     if (data.website?.trim()) {
       setView('success')
@@ -123,6 +163,7 @@ export default function ContactFormModal({ open, onClose }) {
     setSubmitMessage('')
 
     try {
+      const usesBusinessPersistence = hasLeadIngestionEndpoint()
       const response = await fetch(formEndpoint, {
         method: 'POST',
         headers: {
@@ -139,23 +180,32 @@ export default function ContactFormModal({ open, onClose }) {
         }),
       })
 
-      if (!response.ok) {
-        let message = 'No se pudo enviar el formulario.'
-        try {
-          const errorData = await response.json()
-          if (Array.isArray(errorData?.errors) && errorData.errors.length > 0) {
-            message = errorData.errors.map((entry) => entry.message).join(' ')
-          }
-        } catch {
-          // Keep fallback message when response body is not JSON.
-        }
-        throw new Error(message)
+      if (usesBusinessPersistence) {
+        await persistLeadFromContactForm(form, ctaOrigin)
+        notifyFormspree().catch((error) => {
+          console.warn('formspree_notification_failed', error)
+        })
+      } else {
+        await notifyFormspree()
       }
 
       setLastSubmittedHash(payloadHash)
+      trackLeadFormSubmit({
+        form_id: 'contact_modal',
+        submit_status: 'success',
+        persistence: usesBusinessPersistence ? 'supabase' : 'formspree',
+        has_company: Boolean(form.company.trim()),
+        has_message: Boolean(form.message.trim()),
+      })
+      setForm({ name: '', email: '', company: '', message: '', website: '' })
       reset(defaultFormValues)
       setView('success')
     } catch (error) {
+      trackLeadFormSubmit({
+        form_id: 'contact_modal',
+        submit_status: 'error',
+        error_message: error?.message || 'unknown',
+      })
       setSubmitStatus('error')
       setSubmitMessage(error?.message || 'No pudimos enviar el mensaje. Intentá nuevamente en unos minutos.')
     } finally {
@@ -348,29 +398,28 @@ export default function ContactFormModal({ open, onClose }) {
                       {...register('website')}
                     />
 
-                    <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
-                      <p className="text-xs text-white/40">
-                        {submitStatus === 'idle' ? 'Responderemos al correo que ingreses en este formulario.' : submitMessage}
-                      </p>
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold text-white"
-                        style={{
-                          background: 'linear-gradient(135deg, #ED492F 0%, #c73520 60%, #9b2615 100%)',
-                          boxShadow: '0 8px 32px -8px rgba(237,73,47,0.5), inset 0 1px 0 rgba(255,255,255,0.18)',
-                        }}
-                      >
-                        {isSubmitting ? 'Enviando...' : 'Enviar mensaje'}
-                        <Send size={15} />
-                      </motion.button>
-                    </div>
-                    {submitStatus === 'error' && <p className="text-xs text-[#f0a89e]/95">{submitMessage}</p>}
-                  </motion.form>
-                )}
-              </AnimatePresence>
+                <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-xs text-white/40">
+                    {submitStatus === 'idle' && 'Responderemos al correo que ingreses en este formulario.'}
+                  </p>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold text-white"
+                    style={{
+                      background: 'linear-gradient(135deg, #ED492F 0%, #c73520 60%, #9b2615 100%)',
+                      boxShadow: '0 8px 32px -8px rgba(237,73,47,0.5), inset 0 1px 0 rgba(255,255,255,0.18)',
+                    }}
+                  >
+                    {isSubmitting ? 'Enviando...' : 'Enviar mensaje'}
+                    <Send size={15} />
+                  </motion.button>
+                </div>
+                {submitStatus === 'error' && <p className="text-xs text-red-300">{submitMessage}</p>}
+                {submitStatus === 'success' && <p className="text-xs text-emerald-300">{submitMessage}</p>}
+              </form>
             </div>
           </motion.div>
         </motion.div>

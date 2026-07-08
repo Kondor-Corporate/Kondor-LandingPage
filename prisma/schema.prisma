@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum LeadStatus {
+  NEW
+  QUALIFIED
+  MEETING_BOOKED
+  PROPOSAL_SENT
+  WON
+  LOST
+}
+
+model Campaign {
+  id            String         @id @default(uuid()) @db.Uuid
+  name          String
+  source        String
+  medium        String
+  campaignCode  String         @unique @map("campaign_code")
+  objective     String?
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  contentPieces ContentPiece[]
+
+  @@index([source, medium])
+  @@map("campaigns")
+}
+
+model ContentPiece {
+  id             String    @id @default(uuid()) @db.Uuid
+  contentPieceId String    @unique @map("content_piece_id")
+  channel        String
+  format         String?
+  pillar         String?
+  angle          String?
+  publishedAt    DateTime? @map("published_at") @db.Timestamptz(6)
+  url            String?
+  campaignId     String?   @map("campaign_id") @db.Uuid
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  campaign       Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  @@index([campaignId])
+  @@map("content_pieces")
+}
+
+model Lead {
+  id             String              @id @default(uuid()) @db.Uuid
+  createdAt      DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  name           String?
+  email          String?
+  phone          String?
+  source         String
+  medium         String
+  campaign       String?
+  contentPieceId String?             @map("content_piece_id")
+  landingPath    String              @map("landing_path")
+  entryPoint     String?             @map("entry_point")
+  ctaId          String?             @map("cta_id")
+  currentStatus  LeadStatus          @default(NEW) @map("current_status")
+  notes          String?
+  metadata       Json                @default("{}")
+  events         LeadEvent[]
+  statusHistory  LeadStatusHistory[]
+
+  @@index([createdAt])
+  @@index([source, medium, campaign])
+  @@index([contentPieceId])
+  @@index([currentStatus])
+  @@map("leads")
+}
+
+model LeadEvent {
+  id             String   @id @default(uuid()) @db.Uuid
+  leadId         String   @map("lead_id") @db.Uuid
+  eventType      String   @map("event_type")
+  eventTimestamp DateTime @default(now()) @map("event_timestamp") @db.Timestamptz(6)
+  metadata       Json     @default("{}")
+  lead           Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId, eventTimestamp])
+  @@index([eventType])
+  @@map("lead_events")
+}
+
+model LeadStatusHistory {
+  id         String      @id @default(uuid()) @db.Uuid
+  leadId     String      @map("lead_id") @db.Uuid
+  fromStatus LeadStatus? @map("from_status")
+  toStatus   LeadStatus  @map("to_status")
+  changedAt  DateTime    @default(now()) @map("changed_at") @db.Timestamptz(6)
+  changedBy  String?     @map("changed_by")
+  reason     String?
+  lead       Lead        @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId, changedAt])
+  @@map("lead_status_history")
+}
