@@ -54,12 +54,6 @@ const clients = [
     tagline: 'Partnership en plataforma',
   },
   {
-    name: 'Club de campo La Federala',
-    logoSrc: '/portfolio/IconoLF.webp',
-    logoAlt: 'Logo Club de campo La Federala',
-    tagline: 'Comercialización y control',
-  },
-  {
     name: 'Club For Ever',
     logoSrc: '/portfolio/forever.webp',
     logoAlt: 'Logo Club For Ever',
