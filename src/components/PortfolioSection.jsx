@@ -5,49 +5,6 @@ import { Plane, Sparkles } from 'lucide-react'
 /* ── Data ─────────────────────────────────────────────── */
 const clients = [
   {
-    icon: Activity,
-    name: 'Kondor Core',
-    tagline: 'Gestión operativa de base',
-    description:
-      'Plataforma central de gestión operativa para organizaciones en crecimiento. Estructura, visibilidad y control en un único sistema.',
-    bullets: [
-      'Estructura tu operación desde el primer día',
-      'Visibilidad total en un solo sistema',
-      'Adaptable a tu flujo, no al revés',
-    ],
-    status: 'En producción',
-    statusColor: 'text-emerald-200/95 bg-emerald-500/15 border-emerald-400/20',
-    highlight: false,
-  },
-  {
-    icon: GitBranch,
-    name: 'Kondor Flow',
-    tagline: 'Automatización de procesos',
-    description:
-      'Sistema de automatización de flujos operativos diseñado para organizaciones con procesos complejos de gestión y seguimiento.',
-    bullets: [
-      'Automatizá flujos sin depender de IT',
-      'Trazabilidad sin overhead burocrático',
-      'Escalá sin rediseñar todo',
-    ],
-    status: 'En producción',
-    statusColor: 'text-emerald-200/95 bg-emerald-500/15 border-emerald-400/20',
-    highlight: true,
-  },
-  {
-    icon: Eye,
-    name: 'Kondor Lens',
-    tagline: 'Trazabilidad y auditoría',
-    description:
-      'Módulo de trazabilidad y auditoría para equipos distribuidos. Registro completo de operaciones con criterio de ingeniería.',
-    bullets: [
-      'Auditoría completa con criterio de ingeniería',
-      'Integración con sistemas existentes',
-      'Reportes para equipos y directivos',
-    ],
-    status: 'En desarrollo',
-    statusColor: 'text-sky-200/95 bg-sky-500/15 border-sky-400/20',
-    highlight: false,
     name: 'Maps organización',
     logoSrc: '/portfolio/maps.webp',
     logoAlt: 'Logo MAPS organización',
@@ -281,10 +238,6 @@ function LabCard({ Icon, name, status, statusClass }) {
       <span className={`shrink-0 rounded-md border px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] ${statusClass}`}>
         {status}
       </span>
-      <span className="mt-2 text-[9px] text-brand-accent/80 font-semibold tracking-wide underline underline-offset-2">
-        Conocer producto →
-      </span>
-    </button>
     </motion.div>
   )
 }
@@ -323,16 +276,6 @@ export default function PortfolioSection() {
           <span className="text-[10px] font-mono uppercase tracking-[0.28em] text-brand-accent/85">
             Empresas que ya confían en nosotros
           </span>
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
-            <h2 className="text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight text-balance">
-              Nuestro portfolio
-              <br />
-              <span className="text-brand-accent">de productos.</span>
-            </h2>
-            <p className="text-white/55 text-sm leading-relaxed max-w-md">
-              Cada producto resuelve una capa distinta de la operación. Explorá el portfolio y conocé el foco de cada sistema.
-            </p>
-          </div>
           <span className="hidden h-px flex-1 bg-gradient-to-r from-white/12 to-transparent sm:block" aria-hidden />
         </motion.div>
 
@@ -347,38 +290,6 @@ export default function PortfolioSection() {
           <ClientsCarousel />
         </motion.div>
 
-          {/* Panel de detalle único — compacto, bajo la fila */}
-          <AnimatePresence mode="wait">
-            {activeProduct && (
-              <motion.div
-                key={activeProduct.name}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 6 }}
-                transition={{ duration: 0.25 }}
-                className="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-4 sm:px-6 sm:py-5"
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <p className="text-[10px] font-mono text-brand-accent/80 tracking-[0.2em] uppercase">
-                    {activeProduct.name}
-                  </p>
-                  <span className={`text-[8px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md border ${activeProduct.statusColor}`}>
-                    {activeProduct.status}
-                  </span>
-                </div>
-                <p className="text-sm text-white/65 leading-relaxed mb-4">{activeProduct.description}</p>
-                <ul className="flex flex-col gap-1.5">
-                  {activeProduct.bullets.map((b) => (
-                    <li key={b} className="flex items-start gap-2 text-sm text-white/50">
-                      <span className="mt-1.5 w-1 h-1 rounded-full bg-brand-accent/60 shrink-0" />
-                      {b}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
         {/* Lab label */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
