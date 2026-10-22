@@ -18,6 +18,14 @@ function createResponse() {
   }
 }
 
+async function assertEndpointResponse(input, expectedStatus, expectedError) {
+  const response = createResponse()
+  await handler(input, response)
+  assert.equal(response.statusCode, expectedStatus)
+  if (expectedError) assert.equal(response.body?.error, expectedError)
+  return response
+}
+
 const request = {
   method: 'POST',
   body: {
@@ -47,6 +55,21 @@ let createdLeadId = null
 let result = null
 
 try {
+  await assertEndpointResponse({ method: 'GET' }, 405, 'method_not_allowed')
+  await assertEndpointResponse({
+    method: 'POST',
+    body: { lead: { name: 'QA', email: 'not-an-email', message: 'validation test' } },
+  }, 422, 'validation_error')
+  await assertEndpointResponse({
+    method: 'POST',
+    body: { lead: { name: 'QA', email: 'qa@kondor.invalid', message: 'x'.repeat(17000) } },
+  }, 413, 'payload_too_large')
+  const ignoredHoneypot = await assertEndpointResponse({
+    method: 'POST',
+    body: { lead: { website: 'filled-by-bot' } },
+  }, 202)
+  assert.equal(ignoredHoneypot.body?.status, 'ignored')
+
   await handler(request, response)
 
   assert.equal(response.statusCode, 201)
@@ -77,6 +100,7 @@ try {
   assert.equal(lead.statusHistory[0].toStatus, 'NEW')
 
   result = {
+    validation: 'verified',
     lead: 'created',
     events: lead.events.length,
     statusHistory: lead.statusHistory.length,

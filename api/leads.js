@@ -7,6 +7,23 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const ALLOWED_METHODS = ['POST', 'OPTIONS']
+const MAX_BODY_BYTES = 16 * 1024
+const FIELD_LIMITS = {
+  name: 120,
+  email: 254,
+  company: 160,
+  phone: 40,
+  message: 5000,
+  source: 120,
+  medium: 120,
+  campaign: 160,
+  content_piece_id: 160,
+  landing_path: 2048,
+  entry_point: 2048,
+  cta_id: 120,
+}
+
+class RequestBodyTooLargeError extends Error {}
 
 function sendJson(response, statusCode, payload) {
   response.statusCode = statusCode
@@ -38,21 +55,63 @@ function normalizeEntry(entry = {}) {
 
 function validateBody(body) {
   const errors = []
-  const lead = body?.lead ?? {}
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return ['request body must be an object']
+  }
+
+  const lead = body.lead
+  if (!lead || typeof lead !== 'object' || Array.isArray(lead)) {
+    return ['lead must be an object']
+  }
 
   if (!normalizeText(lead.name)) errors.push('name is required')
   if (!normalizeText(lead.email)) errors.push('email is required')
   if (!normalizeText(lead.message)) errors.push('message is required')
 
+  const fields = {
+    name: lead.name,
+    email: lead.email,
+    company: lead.company,
+    phone: lead.phone,
+    message: lead.message,
+    source: body.attribution?.source,
+    medium: body.attribution?.medium,
+    campaign: body.attribution?.campaign,
+    content_piece_id: body.attribution?.content_piece_id,
+    landing_path: body.entry?.landing_path,
+    entry_point: body.entry?.entry_point,
+    cta_id: body.cta_id,
+  }
+  for (const [field, value] of Object.entries(fields)) {
+    const maxLength = FIELD_LIMITS[field]
+    if (value != null && (typeof value !== 'string' || value.length > maxLength)) {
+      errors.push(`${field} must be a string of at most ${maxLength} characters`)
+    }
+  }
+
+  const email = normalizeText(lead.email)
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.push('email must be valid')
+  }
+
   return errors
 }
 
 async function readJsonBody(request) {
-  if (request.body && typeof request.body === 'object') return request.body
+  if (request.body !== undefined) {
+    const body = request.body
+    const bodyBytes = Buffer.byteLength(JSON.stringify(body) ?? '', 'utf8')
+    if (bodyBytes > MAX_BODY_BYTES) throw new RequestBodyTooLargeError()
+    return body
+  }
 
   const chunks = []
+  let bodyBytes = 0
   for await (const chunk of request) {
-    chunks.push(Buffer.from(chunk))
+    const buffer = Buffer.from(chunk)
+    bodyBytes += buffer.length
+    if (bodyBytes > MAX_BODY_BYTES) throw new RequestBodyTooLargeError()
+    chunks.push(buffer)
   }
 
   const rawBody = Buffer.concat(chunks).toString('utf8')
@@ -76,7 +135,11 @@ export default async function handler(request, response) {
   let body
   try {
     body = await readJsonBody(request)
-  } catch {
+  } catch (error) {
+    if (error instanceof RequestBodyTooLargeError) {
+      sendJson(response, 413, { error: 'payload_too_large' })
+      return
+    }
     sendJson(response, 400, { error: 'invalid_json' })
     return
   }
