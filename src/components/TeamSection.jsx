@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Linkedin } from 'lucide-react'
+import { trackOutboundClick } from '../lib/analytics'
 
 /**
  * Editá bio y socials por persona. `kind`: linkedin (más tipos si agregás iconos en el hover)
@@ -198,6 +199,13 @@ export default function TeamSection() {
                                 href={primarySocial.href}
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                onClick={() => {
+                                  trackOutboundClick({
+                                    outbound_url: new URL(primarySocial.href).origin,
+                                    link_text: primarySocial.label,
+                                    location: 'team_card',
+                                  })
+                                }}
                                 className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/45 bg-black/15 text-white transition-colors hover:bg-black/25 xl:h-11 xl:w-11"
                                 aria-label={primarySocial.label}
                               >
